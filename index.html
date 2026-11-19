@@ -2,18 +2,20 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>校園開放日 圖書館歡迎你！ / SCHOOL OPEN DAY: WELCOME TO THE LIBRARY!</title>
-  <!-- 英文復古打字機字體 (Courier Prime & Space Mono) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>嘉智校園開放日 圖書館歡迎你！｜太空情報站</title>
+  <!-- 復古打字機字體 (僅供英文與編號) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- QRCode.js -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
   <!-- Canvas Confetti -->
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+  <!-- Firebase SDK (Compat for single-file instant sync) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
   <style>
     :root {
       --bg-space: #0b1026;
@@ -24,23 +26,20 @@
       --ink-dark: #141829;
     }
 
-    /* 中文使用微軟正黑體確保端正不移位，英文與數字優先套用復古打字機等寬字體 */
     body {
-      font-family: 'Courier Prime', 'Space Mono', "Microsoft JhengHei", "微軟正黑體", sans-serif;
+      font-family: "Microsoft JhengHei", "微軟正黑體", "PingFang TC", "Heiti TC", sans-serif;
       background-color: var(--bg-space);
       color: var(--ink-dark);
       overflow-x: hidden;
       min-height: 100vh;
       position: relative;
+      -webkit-tap-highlight-color: transparent;
     }
 
-    .font-en-typewriter {
+    /* 英文與數字復古打字機字體 */
+    .font-en {
       font-family: 'Courier Prime', 'Space Mono', monospace;
-      letter-spacing: 0.03em;
-    }
-
-    .font-zh-clean {
-      font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+      letter-spacing: 0.02em;
     }
 
     /* 星空背景動畫 */
@@ -50,12 +49,12 @@
       z-index: 0;
       pointer-events: none;
       background:
-        radial-gradient(2px 2px at 20px 30px, #ffffff, rgba(0,0,0,0)),
-        radial-gradient(2px 2px at 80px 120px, #ffb703, rgba(0,0,0,0)),
-        radial-gradient(1.5px 1.5px at 160px 60px, #2ec4b6, rgba(0,0,0,0)),
-        radial-gradient(2.5px 2.5px at 240px 190px, #ffffff, rgba(0,0,0,0)),
-        radial-gradient(1.5px 1.5px at 310px 90px, #ff5a36, rgba(0,0,0,0));
-      background-size: 350px 250px;
+        radial-gradient(2px 2px at 25px 35px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 90px 140px, #ffb703, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 170px 70px, #2ec4b6, rgba(0,0,0,0)),
+        radial-gradient(2.5px 2.5px at 260px 210px, #ffffff, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 320px 100px, #ff5a36, rgba(0,0,0,0));
+      background-size: 360px 260px;
       animation: twinkle 6s infinite alternate ease-in-out;
     }
 
@@ -64,18 +63,18 @@
       100% { opacity: 1; }
     }
 
-    /* 復古透視網格地平線 */
+    /* 復古賽博透視網格地平線 */
     .retro-grid {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
-      height: 28vh;
+      height: 24vh;
       z-index: 0;
       pointer-events: none;
       background-image:
-        linear-gradient(to right, rgba(46, 196, 182, 0.25) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(46, 196, 182, 0.25) 1px, transparent 1px);
+        linear-gradient(to right, rgba(46, 196, 182, 0.22) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(46, 196, 182, 0.22) 1px, transparent 1px);
       background-size: 40px 28px;
       transform: perspective(360px) rotateX(60deg);
       transform-origin: bottom center;
@@ -83,16 +82,24 @@
       -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
     }
 
-    /* 漂浮太空貼圖 */
+    /* 漂浮向量太空插畫動畫 */
     .float-slow {
-      animation: floatY 5s ease-in-out infinite;
+      animation: floatY 5.5s ease-in-out infinite;
     }
     .float-delay {
-      animation: floatY 6.5s ease-in-out 1.5s infinite;
+      animation: floatY 7s ease-in-out 1.5s infinite;
     }
     @keyframes floatY {
-      0%, 100% { transform: translateY(0px) rotate(-4deg); }
-      50% { transform: translateY(-14px) rotate(4deg); }
+      0%, 100% { transform: translateY(0px) rotate(-3deg); }
+      50% { transform: translateY(-12px) rotate(3deg); }
+    }
+
+    @keyframes spinSlow {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .orbit-spin {
+      animation: spinSlow 24s linear infinite;
     }
 
     /* 70s 復古海報硬陰影 */
@@ -100,12 +107,6 @@
       background-color: var(--card-cream);
       border: 3.5px solid var(--ink-dark);
       box-shadow: 6px 6px 0px var(--ink-dark);
-    }
-
-    .retro-box-sm {
-      background-color: var(--card-cream);
-      border: 3px solid var(--ink-dark);
-      box-shadow: 4px 4px 0px var(--ink-dark);
     }
 
     .retro-btn {
@@ -120,6 +121,21 @@
     .retro-btn:active {
       transform: translate(3px, 3px);
       box-shadow: 1px 1px 0px var(--ink-dark);
+    }
+
+    /* 超大圓形報到按鈕 */
+    .circle-checkin-btn {
+      border: 5px solid var(--ink-dark);
+      box-shadow: 0 10px 0 var(--ink-dark), 0 0 0 8px rgba(255, 183, 3, 0.25);
+      transition: transform 0.14s ease, box-shadow 0.14s ease;
+    }
+    .circle-checkin-btn:hover {
+      transform: scale(1.03);
+      box-shadow: 0 12px 0 var(--ink-dark), 0 0 0 12px rgba(255, 183, 3, 0.38);
+    }
+    .circle-checkin-btn:active {
+      transform: translateY(6px) scale(0.98);
+      box-shadow: 0 4px 0 var(--ink-dark), 0 0 0 6px rgba(255, 183, 3, 0.2);
     }
 
     /* 相機濾鏡樣式 */
@@ -147,27 +163,6 @@
     .flash-active {
       animation: cameraFlash 0.45s ease-out forwards;
     }
-
-    /* 超醒目主快門脈衝光暈動畫 */
-    @keyframes shutterPulse {
-      0%, 100% {
-        box-shadow: 5px 5px 0px #141829, 0 0 0 0 rgba(255, 90, 54, 0.75);
-      }
-      50% {
-        box-shadow: 5px 5px 0px #141829, 0 0 0 12px rgba(255, 90, 54, 0);
-      }
-    }
-    .shutter-hero-btn {
-      animation: shutterPulse 2s infinite;
-    }
-    .shutter-hero-btn:hover {
-      transform: translate(-2px, -2px);
-      box-shadow: 7px 7px 0px #141829, 0 0 18px rgba(255, 183, 3, 0.85);
-    }
-    .shutter-hero-btn:active {
-      transform: translate(3px, 3px);
-      box-shadow: 1px 1px 0px #141829;
-    }
   </style>
 </head>
 <body class="selection:bg-[#ffb703] selection:text-[#141829]">
@@ -175,280 +170,359 @@
   <div class="starfield"></div>
   <div class="retro-grid"></div>
 
-  <!-- 漂浮復古太空裝飾 -->
-  <div class="fixed top-24 left-4 text-4xl md:text-5xl opacity-80 pointer-events-none float-slow z-0 select-none">🪐</div>
-  <div class="fixed top-44 right-6 text-3xl md:text-4xl opacity-80 pointer-events-none float-delay z-0 select-none">🛸</div>
-  <div class="fixed bottom-32 left-6 text-3xl md:text-4xl opacity-75 pointer-events-none float-delay z-0 select-none">🚀</div>
+  <!-- 專屬手繪復古太空向量背景插畫 -->
+  <div class="fixed top-20 left-3 w-16 h-16 md:w-24 md:h-24 opacity-80 pointer-events-none float-slow z-0 select-none">
+    <!-- 手繪復古土星 SVG -->
+    <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="60" cy="60" r="30" fill="#FFB703" stroke="#141829" stroke-width="4"/>
+      <path d="M36 52C48 48 72 48 84 52" stroke="#FF5A36" stroke-width="5" stroke-linecap="round"/>
+      <path d="M34 66C48 62 72 62 86 66" stroke="#2EC4B6" stroke-width="4" stroke-linecap="round"/>
+      <ellipse cx="60" cy="60" rx="52" ry="15" transform="rotate(-22 60 60)" stroke="#FAF3E0" stroke-width="4"/>
+      <ellipse cx="60" cy="60" rx="52" ry="15" transform="rotate(-22 60 60)" stroke="#141829" stroke-width="2" stroke-dasharray="6 4"/>
+    </svg>
+  </div>
 
-  <!-- 主容器 -->
-  <div class="relative z-10 max-w-7xl mx-auto px-4 pt-5 pb-36">
+  <div class="fixed top-48 right-3 w-14 h-14 md:w-20 md:h-20 opacity-80 pointer-events-none float-delay z-0 select-none">
+    <!-- 手繪復古軌道衛星 SVG -->
+    <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="38" y="38" width="24" height="24" rx="4" fill="#FAF3E0" stroke="#141829" stroke-width="4"/>
+      <rect x="8" y="42" width="24" height="16" rx="2" fill="#2EC4B6" stroke="#141829" stroke-width="3.5"/>
+      <rect x="68" y="42" width="24" height="16" rx="2" fill="#2EC4B6" stroke="#141829" stroke-width="3.5"/>
+      <line x1="32" y1="50" x2="38" y2="50" stroke="#141829" stroke-width="4"/>
+      <line x1="62" y1="50" x2="68" y2="50" stroke="#141829" stroke-width="4"/>
+      <path d="M50 38V24" stroke="#FAF3E0" stroke-width="4" stroke-linecap="round"/>
+      <circle cx="50" cy="20" r="5" fill="#FF5A36" stroke="#141829" stroke-width="3"/>
+    </svg>
+  </div>
+
+  <!-- 主容器 (專為手機與 iPad 優化間距) -->
+  <div class="relative z-10 max-w-5xl mx-auto px-3.5 sm:px-6 pt-4 pb-16">
     <!-- 頂部特別任務基地看板 -->
-    <header class="retro-box rounded-3xl p-4 md:p-6 mb-6 relative overflow-hidden">
-      <!-- 頂部裝飾色條 -->
-      <div class="flex items-center gap-1.5 mb-3">
-        <span class="h-3 w-12 rounded-full bg-[#ff5a36] border-2 border-[#141829]"></span>
-        <span class="h-3 w-8 rounded-full bg-[#ffb703] border-2 border-[#141829]"></span>
-        <span class="h-3 w-16 rounded-full bg-[#2ec4b6] border-2 border-[#141829]"></span>
-        <span class="ml-auto font-en-typewriter text-xs font-bold tracking-wider text-[#141829]/75 hidden sm:inline">STATION ID: LIB-OPEN-DAY // SECTOR 01</span>
-      </div>
-
-      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div>
-          <div class="flex flex-wrap items-center gap-2 mb-2.5">
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#141829] text-[#faf3e0] text-xs md:text-sm font-bold">
-              <span>🛰️ 校園開放日 · 特別任務基地 / SPECIAL MISSION BASE</span>
-            </span>
-            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#ffb703] text-[#141829] border-2 border-[#141829] text-xs md:text-sm font-black shadow-[2px_2px_0px_#141829]">
-              <span>📡 本日主題：太空情報站 / SPACE INTELLIGENCE STATION</span>
-            </span>
-          </div>
-
-          <h1 class="text-2xl sm:text-3xl md:text-4xl font-black text-[#141829] leading-snug">
-            校園開放日 圖書館歡迎你！<span class="inline-block">✨📚</span>
-          </h1>
-          <div class="font-en-typewriter text-sm sm:text-base md:text-lg font-bold text-[#ff5a36] mt-0.5">
-            SCHOOL OPEN DAY: WELCOME TO THE LIBRARY!
-          </div>
-          <p class="text-xs sm:text-sm font-bold text-[#141829]/80 mt-1.5">
-            歡迎各位星際情報員進站！拍下報到照片、留下情報暗號，立即登上圖書館大螢幕！<br class="hidden sm:inline">
-            <span class="font-en-typewriter text-[#141829]/70">Snap your check-in photo &amp; leave a secret message to appear on the big screen!</span>
-          </p>
+    <header class="retro-box rounded-3xl p-4 sm:p-6 mb-6 relative overflow-hidden">
+      <!-- 頂部裝飾色條與即時連線燈號 -->
+      <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+        <div class="flex items-center gap-1.5">
+          <span class="h-3 w-10 rounded-full bg-[#ff5a36] border-2 border-[#141829]"></span>
+          <span class="h-3 w-7 rounded-full bg-[#ffb703] border-2 border-[#141829]"></span>
+          <span class="h-3 w-12 rounded-full bg-[#2ec4b6] border-2 border-[#141829]"></span>
+          <span class="font-en text-xs font-bold text-[#141829]/75 ml-1">KA CHI LIBRARY // SECTOR 01</span>
         </div>
 
-        <!-- 右側操作按鈕與即時雲端狀態 -->
-        <div class="flex flex-col sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-end gap-3 shrink-0">
-          <div class="flex flex-wrap items-center justify-end gap-2">
-            <div id="cloudStatusBadge" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#2ec4b6]/25 border-2 border-[#141829] text-xs font-bold">
-              <span>🟢 雲端即時同步中 / LIVE CLOUD SYNC</span>
-            </div>
-            <div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white border-2 border-[#141829] text-xs font-bold">
-              <span>已報到情報員 / Agents: <strong id="agentCount" class="font-en-typewriter text-base text-[#ff5a36]">0</strong></span>
-            </div>
+        <div class="flex items-center gap-2">
+          <div id="syncBadge" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#2ec4b6]/25 border-2 border-[#141829] text-xs font-bold">
+            <span id="syncDot" class="w-2.5 h-2.5 rounded-full bg-[#2ec4b6] animate-pulse"></span>
+            <span id="syncText">雲端即時同步中 / <span class="font-en">LIVE SYNC</span></span>
           </div>
+          <!-- 低調館員管理員入口按鈕 -->
+          <button onclick="openAdminModal()" id="adminTopBtn" class="px-2.5 py-1 rounded-full bg-[#141829]/10 hover:bg-[#141829] hover:text-[#faf3e0] border border-[#141829]/40 text-[11px] font-bold transition-colors cursor-pointer" title="館員管理模式">
+            <span id="adminTopLabel">館員管理 / <span class="font-en">ADMIN</span></span>
+          </button>
+        </div>
+      </div>
 
-          <div class="flex flex-wrap items-center gap-2.5">
-            <button onclick="openCameraModal()" class="retro-btn flex-1 sm:flex-none px-5 py-3 rounded-2xl bg-[#ff5a36] text-white font-black text-base md:text-lg flex items-center justify-center gap-2 cursor-pointer">
-              <span class="text-xl">📡</span>
-              <span>情報員拍照報到 / CHECK IN</span>
-            </button>
-            <button onclick="startSlideshow()" class="retro-btn px-4 py-3 rounded-2xl bg-[#ffb703] text-[#141829] font-black text-sm md:text-base flex items-center justify-center gap-1.5 cursor-pointer" title="適合門口電視牆無人操作時自動展示">
-              <span>📺</span>
-              <span>電視牆輪播 / SLIDESHOW</span>
-            </button>
+      <!-- 主標題區 (嘉智校園開放日) -->
+      <div class="text-center sm:text-left">
+        <div class="inline-flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-2.5">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#141829] text-[#faf3e0] text-xs sm:text-sm font-bold">
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="#FFB703" stroke-width="2.5"/><path d="M3 12H21M12 3C14.5 5.5 15.5 8.5 15.5 12C15.5 15.5 14.5 18.5 12 21M12 3C9.5 5.5 8.5 8.5 8.5 12C8.5 15.5 9.5 18.5 12 21" stroke="#2EC4B6" stroke-width="2"/></svg>
+            <span>嘉智校園開放日 · 特別任務基地 / <span class="font-en">KA CHI OPEN DAY</span></span>
+          </span>
+        </div>
+
+        <h1 class="text-2xl sm:text-4xl md:text-[42px] font-black tracking-tight text-[#141829] leading-snug">
+          嘉智校園開放日 圖書館歡迎你！
+          <span class="block font-en text-sm sm:text-lg md:text-xl font-bold text-[#ff5a36] mt-1">
+            KA CHI SCHOOL OPEN DAY: WELCOME TO THE LIBRARY!
+          </span>
+        </h1>
+
+        <!-- 跨科合作主題徽章 -->
+        <div class="mt-3 p-3 rounded-2xl bg-[#ffb703] border-[2.5px] border-[#141829] shadow-[3px_3px_0px_#141829]">
+          <div class="flex items-start sm:items-center gap-2 text-left">
+            <svg class="w-6 h-6 shrink-0 mt-0.5 sm:mt-0" viewBox="0 0 24 24" fill="none"><path d="M12 2V6M12 18V22M4.93 4.93L7.76 7.76M16.24 16.24L19.07 19.07M2 12H6M18 12H22" stroke="#141829" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="12" r="4" fill="#FF5A36" stroke="#141829" stroke-width="2.5"/></svg>
+            <div>
+              <div class="text-xs sm:text-base font-black text-[#141829]">
+                本日主題：太空情報站（圖書館 × 公民與社會發展 × 國民及公民教育）
+              </div>
+              <div class="font-en text-[11px] sm:text-xs font-bold text-[#141829]/85 mt-0.5 leading-snug">
+                TODAY'S THEME: SPACE INTELLIGENCE STATION (Library × Citizenship and Social Development × National and Civic Education)
+              </div>
+            </div>
           </div>
+        </div>
+      </div>
+
+      <!-- 獨立當眼處：超大圓形「情報員拍照報到！」主按鈕 -->
+      <div class="my-6 sm:my-7 flex flex-col items-center justify-center">
+        <div class="relative flex items-center justify-center">
+          <!-- 外圈旋轉太空軌道虛線 -->
+          <div class="absolute -inset-4 rounded-full border-[3px] border-dashed border-[#141829]/45 orbit-spin pointer-events-none"></div>
+
+          <button onclick="openCameraModal()" class="circle-checkin-btn relative w-52 h-52 sm:w-60 sm:h-60 rounded-full bg-[#ff5a36] text-white flex flex-col items-center justify-center p-4 text-center cursor-pointer select-none">
+            <!-- 內圈細白線 -->
+            <div class="absolute inset-2.5 rounded-full border-2 border-[#faf3e0]/60 pointer-events-none"></div>
+
+            <!-- 專屬復古太空快門頭盔 SVG 插畫 -->
+            <svg class="w-16 h-16 sm:w-20 sm:h-20 mb-1.5 drop-shadow-[0_3px_0_#141829]" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="14" y="24" width="52" height="38" rx="10" fill="#FAF3E0" stroke="#141829" stroke-width="4"/>
+              <path d="M28 24L33 15H47L52 24" fill="#FFB703" stroke="#141829" stroke-width="4" stroke-linejoin="round"/>
+              <circle cx="40" cy="43" r="13" fill="#2EC4B6" stroke="#141829" stroke-width="4"/>
+              <circle cx="40" cy="43" r="6" fill="#141829"/>
+              <circle cx="37" cy="40" r="2.2" fill="#FFFFFF"/>
+              <circle cx="57" cy="32" r="3" fill="#FF5A36"/>
+            </svg>
+
+            <span class="text-xl sm:text-2xl font-black tracking-wide leading-tight drop-shadow-[0_2px_0_#141829]">
+              情報員拍照報到
+            </span>
+            <span class="font-en text-xs sm:text-sm font-bold text-[#ffe8a3] mt-1 tracking-wider">
+              AGENT CHECK-IN
+            </span>
+            <span class="mt-1.5 px-3 py-0.5 rounded-full bg-[#141829] text-[#ffb703] text-[11px] font-bold">
+              點擊立即開啟相機
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 底部情報統計與電視輪播按鈕 -->
+      <div class="flex flex-wrap items-center justify-between gap-2.5 pt-3 border-t-2 border-dashed border-[#141829]/25">
+        <div class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-[#141829] text-[#faf3e0] text-xs sm:text-sm font-bold">
+          <span class="w-2.5 h-2.5 rounded-full bg-[#ffb703] animate-ping"></span>
+          <span>已接收情報員 / <span class="font-en">AGENTS</span>：<strong id="agentCount" class="font-en text-base sm:text-lg text-[#ffb703] ml-1">0</strong> 名</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <!-- 管理員專用：清空全部按鈕 (預設隱藏) -->
+          <button id="adminClearAllBtn" onclick="requestClearAll()" class="hidden retro-btn px-3.5 py-2 rounded-xl bg-[#ff5a36] text-white font-black text-xs sm:text-sm cursor-pointer">
+            清空全部紀錄 / <span class="font-en">CLEAR ALL</span>
+          </button>
+
+          <button onclick="startSlideshow()" class="retro-btn px-4 py-2 rounded-xl bg-[#2ec4b6] text-[#141829] font-black text-xs sm:text-sm flex items-center gap-1.5 cursor-pointer">
+            <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="13" rx="2.5" fill="#FAF3E0" stroke="#141829" stroke-width="2.2"/><path d="M8 21H16M12 18V21" stroke="#141829" stroke-width="2.2" stroke-linecap="round"/><polygon points="10,9 15,11.5 10,14" fill="#FF5A36"/></svg>
+            <span>電視牆輪播 / <span class="font-en">SLIDESHOW</span></span>
+          </button>
         </div>
       </div>
     </header>
 
     <!-- 情報分隊篩選列 -->
-    <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
-      <div class="flex flex-wrap items-center gap-2" id="filterBar">
-        <button onclick="setFilter('ALL')" data-filter="ALL" class="filter-btn retro-btn px-3.5 py-1.5 rounded-xl bg-[#ffb703] text-[#141829] font-black text-xs sm:text-sm cursor-pointer">
-          🌌 全部情報 / All (<span id="countAll" class="font-en-typewriter">0</span>)
-        </button>
-        <button onclick="setFilter('實習情報員')" data-filter="實習情報員" class="filter-btn retro-btn px-3 py-1.5 rounded-xl bg-[#faf3e0] text-[#141829] font-bold text-xs sm:text-sm cursor-pointer">
-          🕵️ 實習情報員 / Junior Agent
-        </button>
-        <button onclick="setFilter('星際家長官')" data-filter="星際家長官" class="filter-btn retro-btn px-3 py-1.5 rounded-xl bg-[#faf3e0] text-[#141829] font-bold text-xs sm:text-sm cursor-pointer">
-          🛰️ 星際家長官 / Space Parent
-        </button>
-        <button onclick="setFilter('館內情報員')" data-filter="館內情報員" class="filter-btn retro-btn px-3 py-1.5 rounded-xl bg-[#faf3e0] text-[#141829] font-bold text-xs sm:text-sm cursor-pointer">
-          📡 館內情報員 / Librarian
-        </button>
-        <button onclick="setFilter('資深特派員')" data-filter="資深特派員" class="filter-btn retro-btn px-3 py-1.5 rounded-xl bg-[#faf3e0] text-[#141829] font-bold text-xs sm:text-sm cursor-pointer">
-          🚀 資深特派員 / Alumni Envoy
-        </button>
-        <button onclick="setFilter('神秘外星線人')" data-filter="神秘外星線人" class="filter-btn retro-btn px-3 py-1.5 rounded-xl bg-[#faf3e0] text-[#141829] font-bold text-xs sm:text-sm cursor-pointer">
-          👾 神秘外星線人 / Mystery Alien
-        </button>
-      </div>
-
-      <div class="text-xs text-[#faf3e0]/90 font-bold bg-[#141829]/85 border border-[#2ec4b6]/60 px-3 py-1.5 rounded-xl">
-        💡 閒置 15 秒自動輪播 / Auto-slideshow after 15s idle
-      </div>
-    </div>
-
-    <!-- 拍立得情報照片牆 -->
-    <main id="photoWall" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      <!-- 卡片由 JS 動態渲染 -->
-    </main>
-  </div>
-
-  <!-- 右下角 SPACE INTEL PASS 掃碼報到立牌 -->
-  <div id="qrPassCard" class="fixed bottom-4 right-4 z-30 retro-box-sm rounded-2xl p-3 w-60 sm:w-64 transition-transform hover:scale-105">
-    <div class="flex items-center justify-between border-b-2 border-dashed border-[#141829]/40 pb-1.5 mb-2">
-      <span class="font-en-typewriter text-[11px] font-bold tracking-wider bg-[#141829] text-[#ffb703] px-2 py-0.5 rounded">
-        SPACE INTEL PASS
-      </span>
-      <button onclick="openQrSettings()" class="text-[11px] font-bold px-1.5 py-0.5 rounded bg-[#ffb703]/40 hover:bg-[#ffb703] border border-[#141829] cursor-pointer" title="設定活動網址 / Set URL">
-        ⚙️ 設定 / URL
+    <div class="flex flex-wrap items-center gap-2 mb-5" id="filterBar">
+      <button onclick="setFilter('ALL')" data-filter="ALL" class="filter-btn retro-btn px-3.5 py-2 rounded-xl bg-[#ffb703] text-[#141829] font-black text-xs sm:text-sm cursor-pointer">
+        全部情報 / <span class="font-en">ALL</span> (<span id="countAll" class="font-en">0</span>)
+      </button>
+      <button onclick="setFilter('實習情報員')" data-filter="實習情報員" class="filter-btn retro-btn px-3 py-2 rounded-xl bg-[#faf3e0] text-[#141829] font-bold text-xs sm:text-sm cursor-pointer">
+        實習情報員 / <span class="font-en">Junior</span>
+      </button>
+      <button onclick="setFilter('星際家長官')" data-filter="星際家長官" class="filter-btn retro-btn px-3 py-2 rounded-xl bg-[#faf3e0] text-[#141829] font-bold text-xs sm:text-sm cursor-pointer">
+        星際家長官 / <span class="font-en">Parent</span>
+      </button>
+      <button onclick="setFilter('館內情報員')" data-filter="館內情報員" class="filter-btn retro-btn px-3 py-2 rounded-xl bg-[#faf3e0] text-[#141829] font-bold text-xs sm:text-sm cursor-pointer">
+        館內情報員 / <span class="font-en">Staff</span>
+      </button>
+      <button onclick="setFilter('資深特派員')" data-filter="資深特派員" class="filter-btn retro-btn px-3 py-2 rounded-xl bg-[#faf3e0] text-[#141829] font-bold text-xs sm:text-sm cursor-pointer">
+        資深特派員 / <span class="font-en">Alumni</span>
+      </button>
+      <button onclick="setFilter('神秘外星線人')" data-filter="神秘外星線人" class="filter-btn retro-btn px-3 py-2 rounded-xl bg-[#faf3e0] text-[#141829] font-bold text-xs sm:text-sm cursor-pointer">
+        神秘外星線人 / <span class="font-en">Guest</span>
       </button>
     </div>
-    <div class="flex items-center gap-2.5">
-      <div id="qrcodeBox" class="bg-white p-1.5 rounded-xl border-2 border-[#141829] shrink-0 flex items-center justify-center w-[76px] h-[76px]"></div>
-      <div class="text-xs leading-snug">
-        <div class="font-black text-[#ff5a36] text-sm">📡 情報員掃碼報到</div>
-        <div class="font-en-typewriter text-[11px] font-bold text-[#141829]">SCAN TO CHECK IN</div>
-        <p class="font-bold text-[#141829]/80 text-[11px] mt-0.5">手機掃描立即傳送情報照 ➔</p>
+
+    <!-- 拍立得情報照片牆 (手機單欄、iPad 雙欄/三欄) -->
+    <main id="photoWall" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
+      <!-- 卡片由 JS 動態渲染 -->
+    </main>
+
+    <!-- 頁尾與管理員模式入口 -->
+    <footer class="mt-12 pt-6 border-t border-[#faf3e0]/20 text-center text-xs text-[#faf3e0]/70 space-y-2">
+      <div>嘉智校園開放日 · 圖書館太空情報站（圖書館 × 公民與社會發展 × 國民及公民教育）</div>
+      <div class="font-en">KA CHI SCHOOL OPEN DAY · SPACE INTELLIGENCE STATION</div>
+      <div>
+        <button onclick="openAdminModal()" class="underline hover:text-[#ffb703] cursor-pointer">
+          <span id="adminFooterLabel">切換館員管理模式 / Toggle Admin Mode</span>
+        </button>
       </div>
-    </div>
+    </footer>
   </div>
 
-  <!-- ==================== 拍照與打卡工作台 Modal ==================== -->
-  <div id="cameraModal" class="fixed inset-0 z-50 hidden bg-[#0b1026]/92 backdrop-blur-sm overflow-y-auto p-2 sm:p-5">
-    <div class="max-w-6xl mx-auto retro-box rounded-3xl p-4 sm:p-6 my-1">
+  <!-- ==================== 拍照與打卡工作台 Modal (專為手機與 iPad 優化) ==================== -->
+  <div id="cameraModal" class="fixed inset-0 z-50 hidden bg-[#0b1026]/92 backdrop-blur-sm overflow-y-auto p-2.5 sm:p-5">
+    <div class="max-w-4xl mx-auto retro-box rounded-3xl p-4 sm:p-6 my-1 sm:my-3">
       <!-- Modal 頂部列 -->
-      <div class="flex items-center justify-between border-b-3 border-[#141829] pb-3 mb-4">
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="text-2xl sm:text-3xl">📡</span>
-          <h2 class="text-xl sm:text-2xl font-black">太空情報站 · 傳送門相機 <span class="font-en-typewriter text-sm sm:text-base text-[#ff5a36]">/ PORTAL CAMERA</span></h2>
+      <div class="flex items-center justify-between border-b-[3px] border-[#141829] pb-3 mb-4">
+        <div class="flex items-center gap-2.5">
+          <svg class="w-7 h-7 shrink-0" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="13" fill="#FF5A36" stroke="#141829" stroke-width="2.5"/><circle cx="16" cy="16" r="6" fill="#FAF3E0" stroke="#141829" stroke-width="2.5"/></svg>
+          <div>
+            <h2 class="text-lg sm:text-2xl font-black leading-tight">太空情報站 · 傳送門相機</h2>
+            <p class="font-en text-xs font-bold text-[#141829]/70">SPACE INTEL PORTAL CAMERA</p>
+          </div>
         </div>
-        <button onclick="closeCameraModal()" class="retro-btn px-4 py-2 rounded-xl bg-[#faf3e0] font-black text-sm sm:text-base cursor-pointer">
-          ✕ 關閉 / CLOSE
+        <button onclick="closeCameraModal()" class="retro-btn px-3.5 py-2 rounded-xl bg-[#faf3e0] font-black text-xs sm:text-sm cursor-pointer">
+          關閉 / <span class="font-en">CLOSE</span>
         </button>
       </div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        <!-- 左側：超大太空艙觀景窗與超醒目快門控制 (佔 8 欄) -->
-        <div class="lg:col-span-8 flex flex-col gap-3.5">
-          <div class="relative rounded-2xl overflow-hidden border-4 border-[#141829] bg-[#141829] aspect-[4/3] w-full min-h-[280px] sm:min-h-[430px] shadow-[6px_6px_0px_#141829]">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+        <!-- 左側/上方：超大太空艙觀景窗與主次分明快門 -->
+        <div class="lg:col-span-7 flex flex-col gap-3">
+          <div class="relative rounded-2xl overflow-hidden border-4 border-[#141829] bg-[#141829] aspect-[4/3] w-full shadow-[5px_5px_0px_#141829]">
             <!-- 太空觀景窗 HUD -->
             <div class="absolute top-3 left-3 right-3 z-20 flex items-center justify-between pointer-events-none">
-              <span class="font-en-typewriter text-xs sm:text-sm font-bold px-3 py-1 rounded bg-[#141829]/85 text-[#2ec4b6] border border-[#2ec4b6]">
-                ● INTEL-CAM // 太空情報站掃描中
+              <span class="font-en text-[11px] font-bold px-2.5 py-1 rounded bg-[#141829]/85 text-[#2ec4b6] border border-[#2ec4b6]">
+                INTEL-CAM // KA CHI STATION
               </span>
-              <span class="font-en-typewriter text-xs sm:text-sm font-bold px-2.5 py-1 rounded bg-[#ff5a36] text-white">
+              <span class="font-en text-[11px] font-bold px-2 py-1 rounded bg-[#ff5a36] text-white">
                 REC
               </span>
             </div>
 
             <!-- 四角準星 -->
-            <div class="absolute top-2.5 left-2.5 w-7 h-7 border-t-4 border-l-4 border-[#ffb703] z-20 pointer-events-none"></div>
-            <div class="absolute top-2.5 right-2.5 w-7 h-7 border-t-4 border-r-4 border-[#ffb703] z-20 pointer-events-none"></div>
-            <div class="absolute bottom-2.5 left-2.5 w-7 h-7 border-b-4 border-l-4 border-[#ffb703] z-20 pointer-events-none"></div>
-            <div class="absolute bottom-2.5 right-2.5 w-7 h-7 border-b-4 border-r-4 border-[#ffb703] z-20 pointer-events-none"></div>
+            <div class="absolute top-2 left-2 w-6 h-6 border-t-4 border-l-4 border-[#ffb703] z-20 pointer-events-none"></div>
+            <div class="absolute top-2 right-2 w-6 h-6 border-t-4 border-r-4 border-[#ffb703] z-20 pointer-events-none"></div>
+            <div class="absolute bottom-2 left-2 w-6 h-6 border-b-4 border-l-4 border-[#ffb703] z-20 pointer-events-none"></div>
+            <div class="absolute bottom-2 right-2 w-6 h-6 border-b-4 border-r-4 border-[#ffb703] z-20 pointer-events-none"></div>
 
             <!-- 即時視訊預覽 -->
             <video id="videoPreview" autoplay playsinline muted class="w-full h-full object-cover mirror-video filter-none"></video>
 
             <!-- 拍攝後/上傳後的照片預覽 -->
-            <img id="capturedPreview" class="hidden w-full h-full object-cover" alt="拍攝預覽 / Captured Preview" />
+            <img id="capturedPreview" class="hidden w-full h-full object-cover" alt="拍攝預覽" />
 
             <!-- 相機未開啟提示 -->
-            <div id="cameraPlaceholder" class="hidden absolute inset-0 flex flex-col items-center justify-center text-center p-6 text-[#faf3e0]">
-              <div class="text-6xl mb-3">🛸</div>
-              <p class="font-black text-xl mb-1">尚未偵測到鏡頭或權限未開啟 / Camera Unavailable</p>
-              <p class="text-sm text-[#faf3e0]/80 mb-4">請點擊下方「🖼️ 相簿上傳 / Upload」選擇照片，或允許瀏覽器使用相機！</p>
-              <button onclick="startCamera()" class="retro-btn px-5 py-2.5 rounded-xl bg-[#2ec4b6] text-[#141829] font-black text-base cursor-pointer">
-                🔄 重新啟動鏡頭 / Retry Camera
+            <div id="cameraPlaceholder" class="hidden absolute inset-0 flex flex-col items-center justify-center text-center p-5 text-[#faf3e0]">
+              <svg class="w-16 h-16 mb-2" viewBox="0 0 80 80" fill="none"><ellipse cx="40" cy="46" rx="30" ry="12" fill="#2EC4B6" stroke="#FAF3E0" stroke-width="3"/><path d="M24 42C24 30 31 22 40 22C49 22 56 30 56 42" fill="#FFB703" stroke="#FAF3E0" stroke-width="3"/></svg>
+              <p class="font-black text-base sm:text-lg mb-1">尚未開啟鏡頭 / <span class="font-en">CAMERA STANDBY</span></p>
+              <p class="text-xs text-[#faf3e0]/80 mb-3">請允許相機權限，或直接點擊下方「相簿上傳」選擇照片！</p>
+              <button onclick="startCamera()" class="retro-btn px-4 py-2 rounded-xl bg-[#2ec4b6] text-[#141829] font-black text-xs sm:text-sm cursor-pointer">
+                重新啟動鏡頭 / <span class="font-en">RETRY</span>
               </button>
             </div>
 
             <!-- 3-2-1 倒數大字疊層 -->
-            <div id="countdownOverlay" class="hidden absolute inset-0 z-30 bg-[#141829]/55 flex flex-col items-center justify-center">
-              <div id="countdownNumber" class="font-en-typewriter text-8xl sm:text-9xl font-bold text-[#ffb703] drop-shadow-[0_6px_0_#141829]">3</div>
-              <div class="text-white font-black text-lg sm:text-xl mt-2 bg-[#ff5a36] px-5 py-1.5 rounded-full border-2 border-[#141829]">擺好情報員 POSE！ / STRIKE A POSE!</div>
+            <div id="countdownOverlay" class="hidden absolute inset-0 z-30 bg-[#141829]/60 flex flex-col items-center justify-center">
+              <div id="countdownNumber" class="font-en text-8xl sm:text-9xl font-bold text-[#ffb703] drop-shadow-[0_6px_0_#141829]">3</div>
+              <div class="text-white font-black text-base sm:text-lg mt-2 bg-[#ff5a36] px-4 py-1 rounded-full border-2 border-[#141829]">
+                擺好情報員 POSE！ / <span class="font-en">READY!</span>
+              </div>
             </div>
 
             <!-- 快門閃光燈 -->
             <div id="flashOverlay" class="pointer-events-none absolute inset-0 z-40 bg-white opacity-0"></div>
           </div>
 
-          <!-- 超醒目快門與鏡頭控制列 -->
-          <div id="liveControls" class="flex flex-col sm:flex-row items-stretch gap-3">
-            <button onclick="triggerCountdownPhoto()" class="shutter-hero-btn flex-[2] py-4 px-5 rounded-2xl bg-[#ff5a36] text-white border-4 border-[#141829] font-black text-lg sm:text-xl flex items-center justify-center gap-2.5 cursor-pointer transition-transform">
-              <span class="text-2xl sm:text-3xl bg-white/20 p-1.5 rounded-xl border-2 border-white/50">📸</span>
-              <span>3 秒倒數拍照！ / 3s Countdown</span>
+          <!-- 快門與鏡頭控制鈕：超大「立即快門」為主，較小「3秒倒數」為輔 -->
+          <div id="liveControls" class="flex flex-col gap-2.5">
+            <!-- 超大主快門：立即按下 -->
+            <button onclick="takePhotoNow()" class="retro-btn w-full py-4 sm:py-5 px-6 rounded-2xl bg-[#ff5a36] text-white font-black text-xl sm:text-2xl flex items-center justify-center gap-3 cursor-pointer">
+              <svg class="w-8 h-8 shrink-0" viewBox="0 0 36 36" fill="none"><circle cx="18" cy="18" r="14" fill="#FAF3E0" stroke="#141829" stroke-width="3"/><circle cx="18" cy="18" r="7" fill="#FF5A36" stroke="#141829" stroke-width="2.5"/></svg>
+              <span>立即快門 / <span class="font-en">SNAP NOW!</span></span>
             </button>
-            <div class="flex items-stretch gap-2 flex-1">
-              <button onclick="takePhotoNow()" class="retro-btn flex-1 py-3.5 px-3 rounded-2xl bg-[#ffb703] text-[#141829] font-black text-sm sm:text-base flex flex-col sm:flex-row items-center justify-center gap-1 cursor-pointer">
-                <span>⚡</span>
-                <span>立即快門 / Snap Now</span>
+
+            <!-- 較小輔助按鈕列：3秒倒數、翻轉鏡頭、相簿上傳 -->
+            <div class="grid grid-cols-3 gap-2">
+              <button onclick="triggerCountdownPhoto()" class="retro-btn py-2.5 px-2 rounded-xl bg-[#ffb703] text-[#141829] font-black text-xs sm:text-sm flex items-center justify-center gap-1 cursor-pointer">
+                <span>3 秒倒數 / <span class="font-en">3s</span></span>
               </button>
-              <button onclick="switchCamera()" class="retro-btn py-3.5 px-3 rounded-2xl bg-[#faf3e0] text-[#141829] font-black text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-1 cursor-pointer" title="切換前後鏡頭 / Flip Camera">
-                <span>🔄</span>
-                <span>翻轉 / Flip</span>
+              <button onclick="switchCamera()" class="retro-btn py-2.5 px-2 rounded-xl bg-[#faf3e0] text-[#141829] font-bold text-xs sm:text-sm flex items-center justify-center gap-1 cursor-pointer">
+                <span>翻轉鏡頭 / <span class="font-en">FLIP</span></span>
               </button>
-              <label class="retro-btn py-3.5 px-3.5 rounded-2xl bg-[#2ec4b6] text-[#141829] font-black text-xs sm:text-sm flex flex-col sm:flex-row items-center justify-center gap-1 cursor-pointer">
-                <span>🖼️</span>
-                <span>相簿上傳 / Upload</span>
+              <label class="retro-btn py-2.5 px-2 rounded-xl bg-[#2ec4b6] text-[#141829] font-black text-xs sm:text-sm flex items-center justify-center gap-1 cursor-pointer text-center">
+                <span>相簿上傳 / <span class="font-en">UPLOAD</span></span>
                 <input type="file" accept="image/*" onchange="handleFileUpload(event)" class="hidden" />
               </label>
             </div>
           </div>
 
           <!-- 重拍按鈕（拍完後顯示） -->
-          <div id="retakeControls" class="hidden flex flex-wrap items-center justify-center gap-3">
-            <button onclick="resetToCamera()" class="retro-btn flex-1 min-w-[200px] py-3.5 px-6 rounded-2xl bg-[#ffb703] text-[#141829] font-black text-base sm:text-lg cursor-pointer">
-              🔄 不滿意，重新拍攝 / Retake Photo
+          <div id="retakeControls" class="hidden grid grid-cols-2 gap-2.5">
+            <button onclick="resetToCamera()" class="retro-btn py-3 px-4 rounded-2xl bg-[#faf3e0] text-[#141829] font-black text-sm cursor-pointer">
+              重新拍攝 / <span class="font-en">RETAKE</span>
             </button>
-            <label class="retro-btn py-3.5 px-5 rounded-2xl bg-[#2ec4b6] text-[#141829] font-black text-sm sm:text-base cursor-pointer">
-              🖼️ 換一張相簿照片 / Choose Another
+            <label class="retro-btn py-3 px-4 rounded-2xl bg-[#2ec4b6] text-[#141829] font-black text-sm cursor-pointer text-center">
+              換一張照片 / <span class="font-en">CHANGE</span>
               <input type="file" accept="image/*" onchange="handleFileUpload(event)" class="hidden" />
             </label>
           </div>
 
           <!-- 復古太空濾鏡選擇 -->
-          <div class="bg-white/80 border-2 border-[#141829] rounded-2xl p-3">
-            <div class="text-xs font-black mb-2 text-[#141829]">🎞️ 選擇復古太空底片濾鏡 / Select Retro Space Filter：</div>
+          <div class="bg-white/80 border-2 border-[#141829] rounded-2xl p-2.5 sm:p-3">
+            <div class="text-xs font-black mb-2 text-[#141829]">復古太空底片濾鏡 / <span class="font-en">RETRO SPACE FILTERS</span>：</div>
             <div class="grid grid-cols-5 gap-1.5 text-[11px] sm:text-xs font-bold">
-              <button onclick="setFilterEffect('filter-none', this)" class="filter-chip py-2 px-1 rounded-xl border-2 border-[#141829] bg-[#ffb703] font-black cursor-pointer">原圖<br><span class="font-en-typewriter text-[10px]">Original</span></button>
-              <button onclick="setFilterEffect('filter-kodak', this)" class="filter-chip py-2 px-1 rounded-xl border-2 border-[#141829] bg-white cursor-pointer">70s底片<br><span class="font-en-typewriter text-[10px]">70s Film</span></button>
-              <button onclick="setFilterEffect('filter-mars', this)" class="filter-chip py-2 px-1 rounded-xl border-2 border-[#141829] bg-white cursor-pointer">暖陽火星<br><span class="font-en-typewriter text-[10px]">Warm Mars</span></button>
-              <button onclick="setFilterEffect('filter-mono', this)" class="filter-chip py-2 px-1 rounded-xl border-2 border-[#141829] bg-white cursor-pointer">復古黑白<br><span class="font-en-typewriter text-[10px]">Retro B&amp;W</span></button>
-              <button onclick="setFilterEffect('filter-nebula', this)" class="filter-chip py-2 px-1 rounded-xl border-2 border-[#141829] bg-white cursor-pointer">霓虹星雲<br><span class="font-en-typewriter text-[10px]">Neon Nebula</span></button>
+              <button onclick="setFilterEffect('filter-none', this)" class="filter-chip py-1.5 px-1 rounded-xl border-2 border-[#141829] bg-[#ffb703] font-black cursor-pointer">原圖<br><span class="font-en text-[10px]">Normal</span></button>
+              <button onclick="setFilterEffect('filter-kodak', this)" class="filter-chip py-1.5 px-1 rounded-xl border-2 border-[#141829] bg-white cursor-pointer">70s底片<br><span class="font-en text-[10px]">70sFilm</span></button>
+              <button onclick="setFilterEffect('filter-mars', this)" class="filter-chip py-1.5 px-1 rounded-xl border-2 border-[#141829] bg-white cursor-pointer">暖陽火星<br><span class="font-en text-[10px]">Mars</span></button>
+              <button onclick="setFilterEffect('filter-mono', this)" class="filter-chip py-1.5 px-1 rounded-xl border-2 border-[#141829] bg-white cursor-pointer">復古黑白<br><span class="font-en text-[10px]">Mono</span></button>
+              <button onclick="setFilterEffect('filter-nebula', this)" class="filter-chip py-1.5 px-1 rounded-xl border-2 border-[#141829] bg-white cursor-pointer">霓虹星雲<br><span class="font-en text-[10px]">Nebula</span></button>
             </div>
           </div>
         </div>
 
-        <!-- 右側：情報員資料、拍立得相框與快捷留言 (佔 4 欄) -->
-        <div class="lg:col-span-4 flex flex-col justify-between gap-4">
-          <div class="space-y-4">
+        <!-- 右側/下方：情報員資料與快捷留言 (無任務認證印章欄位) -->
+        <div class="lg:col-span-5 flex flex-col justify-between gap-3.5">
+          <div class="space-y-3.5">
             <!-- 1. 情報員身分代號 -->
             <div>
-              <label class="block text-xs sm:text-sm font-black mb-1.5">1. 情報員身分代號 / Agent Role：</label>
-              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-1.5 text-xs font-bold" id="roleSelector">
-                <button type="button" onclick="selectRole('實習情報員', 'Junior Agent', '🕵️', this)" class="role-btn py-2 px-3 rounded-xl border-2 border-[#141829] bg-[#ffb703] font-black text-left cursor-pointer">🕵️ 實習情報員 / Junior Agent</button>
-                <button type="button" onclick="selectRole('星際家長官', 'Space Parent', '🛰️', this)" class="role-btn py-2 px-3 rounded-xl border-2 border-[#141829] bg-white text-left cursor-pointer">🛰️ 星際家長官 / Space Parent</button>
-                <button type="button" onclick="selectRole('館內情報員', 'Station Librarian', '📡', this)" class="role-btn py-2 px-3 rounded-xl border-2 border-[#141829] bg-white text-left cursor-pointer">📡 館內情報員 / Station Librarian</button>
-                <button type="button" onclick="selectRole('資深特派員', 'Alumni Envoy', '🚀', this)" class="role-btn py-2 px-3 rounded-xl border-2 border-[#141829] bg-white text-left cursor-pointer">🚀 資深特派員 / Alumni Envoy</button>
-                <button type="button" onclick="selectRole('神秘外星線人', 'Mystery Alien', '👾', this)" class="role-btn py-2 px-3 rounded-xl border-2 border-[#141829] bg-white text-left cursor-pointer">👾 神秘外星線人 / Mystery Alien</button>
+              <label class="block text-xs font-black mb-1.5">1. 選擇情報員身分代號 / <span class="font-en">SELECT AGENT ROLE</span>：</label>
+              <div class="grid grid-cols-2 gap-1.5 text-xs font-bold" id="roleSelector">
+                <button type="button" onclick="selectRole('實習情報員', 'Junior Agent', 'badge-junior', this)" class="role-btn py-2 px-2.5 rounded-xl border-2 border-[#141829] bg-[#ffb703] font-black text-left cursor-pointer">
+                  實習情報員<br><span class="font-en text-[10px]">Junior Agent</span>
+                </button>
+                <button type="button" onclick="selectRole('星際家長官', 'Space Parent', 'badge-parent', this)" class="role-btn py-2 px-2.5 rounded-xl border-2 border-[#141829] bg-white text-left cursor-pointer">
+                  星際家長官<br><span class="font-en text-[10px]">Space Parent</span>
+                </button>
+                <button type="button" onclick="selectRole('館內情報員', 'Library Crew', 'badge-staff', this)" class="role-btn py-2 px-2.5 rounded-xl border-2 border-[#141829] bg-white text-left cursor-pointer">
+                  館內情報員<br><span class="font-en text-[10px]">Library Crew</span>
+                </button>
+                <button type="button" onclick="selectRole('資深特派員', 'Senior Envoy', 'badge-alumni', this)" class="role-btn py-2 px-2.5 rounded-xl border-2 border-[#141829] bg-white text-left cursor-pointer">
+                  資深特派員<br><span class="font-en text-[10px]">Senior Envoy</span>
+                </button>
+                <button type="button" onclick="selectRole('神秘外星線人', 'Cosmic Guest', 'badge-guest', this)" class="role-btn py-2 px-2.5 rounded-xl border-2 border-[#141829] bg-white text-left cursor-pointer col-span-2">
+                  神秘外星線人 / <span class="font-en text-[10px]">Cosmic Guest</span>
+                </button>
               </div>
             </div>
 
             <!-- 2. 情報員暱稱 -->
             <div>
-              <label class="block text-xs sm:text-sm font-black mb-1">2. 情報員代號 / Agent Name (Optional)：</label>
-              <input id="agentNameInput" type="text" maxlength="18" placeholder="例如：阿波羅小明 / Apollo Ming..." class="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#141829] bg-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5a36]" />
+              <label class="block text-xs font-black mb-1">2. 情報員代號或暱稱 / <span class="font-en">CODENAME</span>（可留白）：</label>
+              <input id="agentNameInput" type="text" maxlength="16" placeholder="例如：嘉智小明 / Ka Chi Explorer..." class="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#141829] bg-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5a36]" />
             </div>
 
             <!-- 3. 拍立得相框色 -->
             <div>
-              <label class="block text-xs sm:text-sm font-black mb-1">3. 拍立得相框色 / Polaroid Frame：</label>
-              <select id="frameSelect" class="w-full px-3 py-2.5 rounded-xl border-2 border-[#141829] bg-white font-bold text-sm">
-                <option value="frame-cream">奶油太空紙 / Space Cream</option>
-                <option value="frame-gold">土星光環金 / Saturn Gold</option>
-                <option value="frame-mint">星際薄荷藍 / Star Mint</option>
+              <label class="block text-xs font-black mb-1">3. 拍立得相框色 / <span class="font-en">POLAROID FRAME</span>：</label>
+              <select id="frameSelect" class="w-full px-3 py-2.5 rounded-xl border-2 border-[#141829] bg-white font-bold text-xs sm:text-sm">
+                <option value="frame-cream">奶油太空紙 / Classic Space Cream</option>
+                <option value="frame-gold">土星光環金 / Saturn Ring Gold</option>
+                <option value="frame-mint">星際薄荷藍 / Cosmic Mint Blue</option>
               </select>
             </div>
 
             <!-- 4. 一鍵情報回報留言 -->
             <div>
-              <label class="block text-xs sm:text-sm font-black mb-1">4. 情報回報暗號 / Secret Message：</label>
-              <div class="flex flex-col gap-1.5 mb-2">
-                <button type="button" onclick="fillMessage('成功潛入太空情報站！ / Entered the Space Intel Station! 📡')" class="text-[11px] font-bold px-2.5 py-1.5 rounded-lg bg-[#2ec4b6]/25 hover:bg-[#2ec4b6]/50 border border-[#141829] text-left cursor-pointer">📡 成功潛入太空情報站！ / Entered the Station!</button>
-                <button type="button" onclick="fillMessage('在知識宇宙發現寶藏好書！ / Found treasure books in space! 🚀📚')" class="text-[11px] font-bold px-2.5 py-1.5 rounded-lg bg-[#ffb703]/35 hover:bg-[#ffb703]/60 border border-[#141829] text-left cursor-pointer">🚀 發現寶藏好書！ / Found treasure books!</button>
-                <button type="button" onclick="fillMessage('情報員報到完畢！ / Agent checked in! ✨')" class="text-[11px] font-bold px-2.5 py-1.5 rounded-lg bg-[#ff5a36]/20 hover:bg-[#ff5a36]/40 border border-[#141829] text-left cursor-pointer">✨ 情報員報到完畢！ / Agent checked in!</button>
-                <button type="button" onclick="fillMessage('呼叫總部！閱讀基地超棒！ / Calling HQ! Awesome library! 🛸')" class="text-[11px] font-bold px-2.5 py-1.5 rounded-lg bg-white hover:bg-gray-100 border border-[#141829] text-left cursor-pointer">🛸 呼叫總部！基地超棒！ / Calling HQ! Awesome!</button>
+              <label class="block text-xs font-black mb-1">4. 情報回報暗號 / <span class="font-en">INTEL MESSAGE</span>：</label>
+              <div class="flex flex-wrap gap-1.5 mb-2">
+                <button type="button" onclick="fillMessage('成功潛入太空情報站，圖書館超酷！ / Space Intel Station rocks!')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-[#2ec4b6]/25 hover:bg-[#2ec4b6]/50 border border-[#141829] cursor-pointer">
+                  成功潛入情報站！
+                </button>
+                <button type="button" onclick="fillMessage('在知識宇宙發現好多寶藏好書！ / Found awesome books in space!')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-[#ffb703]/35 hover:bg-[#ffb703]/60 border border-[#141829] cursor-pointer">
+                  發現寶藏好書！
+                </button>
+                <button type="button" onclick="fillMessage('嘉智情報員報到完畢！ / Ka Chi Agent checked in!')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-[#ff5a36]/20 hover:bg-[#ff5a36]/40 border border-[#141829] cursor-pointer">
+                  嘉智情報員報到完畢！
+                </button>
+                <button type="button" onclick="fillMessage('呼叫總部！這裡的閱讀基地太棒了！ / Calling HQ: Best reading base!')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-white hover:bg-gray-100 border border-[#141829] cursor-pointer">
+                  呼叫總部超棒！
+                </button>
               </div>
-              <textarea id="messageInput" rows="2" maxlength="80" placeholder="寫下你的雙語打卡心得 / Write your message..." class="w-full px-3.5 py-2 rounded-xl border-2 border-[#141829] bg-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5a36]"></textarea>
+              <textarea id="messageInput" rows="2" maxlength="75" placeholder="寫下你的太空情報站打卡心得 / Write your message..." class="w-full px-3.5 py-2 rounded-xl border-2 border-[#141829] bg-white font-bold text-sm focus:outline-none focus:ring-2 focus:ring-[#ff5a36]"></textarea>
             </div>
           </div>
 
           <!-- 發布上牆按鈕 -->
           <button id="publishBtn" onclick="publishCheckIn()" class="retro-btn w-full py-4 px-5 rounded-2xl bg-[#2ec4b6] text-[#141829] font-black text-base sm:text-lg flex items-center justify-center gap-2 cursor-pointer">
-            <span>🚀</span>
-            <span>傳送情報！登上電視牆 / TRANSMIT TO TV WALL</span>
+            <svg class="w-6 h-6 shrink-0" viewBox="0 0 24 24" fill="none"><path d="M4 12L20 4L13 20L11 13L4 12Z" fill="#FAF3E0" stroke="#141829" stroke-width="2.2" stroke-linejoin="round"/></svg>
+            <span>傳送情報上牆！ / <span class="font-en">TRANSMIT!</span></span>
           </button>
         </div>
       </div>
@@ -457,15 +531,18 @@
 
   <!-- ==================== 打卡成功慶祝畫面 (3秒自動關閉) ==================== -->
   <div id="successModal" class="fixed inset-0 z-50 hidden bg-[#0b1026]/85 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="retro-box rounded-3xl p-8 max-w-md w-full text-center">
-      <div class="text-6xl mb-3">🎉📡🚀</div>
+    <div class="retro-box rounded-3xl p-7 sm:p-8 max-w-md w-full text-center">
+      <svg class="w-20 h-20 mx-auto mb-3" viewBox="0 0 80 80" fill="none">
+        <circle cx="40" cy="40" r="34" fill="#FFB703" stroke="#141829" stroke-width="4"/>
+        <path d="M25 41L35 51L56 30" stroke="#141829" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
       <h3 class="text-2xl sm:text-3xl font-black text-[#141829] mb-1">情報傳送成功！</h3>
-      <div class="font-en-typewriter text-base font-bold text-[#ff5a36] mb-3">TRANSMISSION COMPLETE!</div>
+      <div class="font-en text-sm font-bold text-[#ff5a36] mb-3">TRANSMISSION COMPLETE!</div>
       <p class="font-bold text-[#141829]/85 text-sm sm:text-base mb-4">
-        您的拍立得已同步登上<br><span class="text-[#ff5a36] font-black">「圖書館太空情報站」雲端大螢幕！</span>
+        您的拍立得已同步登上<br><span class="text-[#ff5a36] font-black">「嘉智圖書館 · 太空情報站」照片牆！</span>
       </p>
-      <div class="inline-block px-4 py-1.5 rounded-full bg-[#ffb703] border-2 border-[#141829] text-xs font-black">
-        3 秒後自動返回 / Returning in 3s...
+      <div class="inline-block px-4 py-1.5 rounded-full bg-[#2ec4b6] border-2 border-[#141829] text-xs font-black">
+        3 秒後自動返回情報牆 / <span class="font-en">RETURNING...</span>
       </div>
     </div>
   </div>
@@ -475,11 +552,11 @@
     <div class="w-full max-w-4xl flex flex-wrap items-center justify-between gap-2 text-[#faf3e0] mb-4">
       <div class="flex items-center gap-2">
         <span class="px-3 py-1 rounded-full bg-[#ff5a36] text-white font-black text-xs sm:text-sm border-2 border-[#faf3e0]">
-          📺 太空情報站 · 電視牆精選輪播 / TV SPOTLIGHT
+          嘉智太空情報站 · 電視牆輪播 / <span class="font-en">TV SPOTLIGHT</span>
         </span>
       </div>
       <button onclick="stopSlideshow()" class="retro-btn px-4 py-1.5 rounded-xl bg-[#ffb703] text-[#141829] font-black text-xs sm:text-sm cursor-pointer">
-        👆 點擊任意處返回 / Tap anywhere to return
+        點擊返回情報牆 / <span class="font-en">BACK TO WALL</span>
       </button>
     </div>
 
@@ -488,83 +565,107 @@
     </div>
   </div>
 
-  <!-- ==================== QR Code 網址設定 Modal ==================== -->
-  <div id="qrSettingsModal" class="fixed inset-0 z-50 hidden bg-[#0b1026]/80 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="retro-box rounded-3xl p-6 max-w-md w-full">
-      <h3 class="text-xl font-black mb-2">⚙️ 設定電視牆掃碼網址 / Set QR Code URL</h3>
+  <!-- ==================== 館員管理員密碼與確認 Modal (取代 alert/confirm/prompt) ==================== -->
+  <div id="adminAuthModal" class="fixed inset-0 z-50 hidden bg-[#0b1026]/85 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="retro-box rounded-3xl p-6 max-w-sm w-full">
+      <h3 class="text-xl font-black text-[#141829] mb-1">館員管理員驗證</h3>
+      <div class="font-en text-xs font-bold text-[#ff5a36] mb-3">LIBRARIAN ADMIN VERIFICATION</div>
       <p class="text-xs font-bold text-[#141829]/80 mb-3">
-        請貼上您上傳到 <strong>GitHub Pages</strong> 後的公開網址，電視右下角的 QR Code 會立刻更新並永久記住！<br>
-        <span class="font-en-typewriter text-[11px]">Paste your GitHub Pages URL below to update the QR code.</span>
+        請輸入館員密碼（預設 <span class="font-en font-black">8888</span>）以開啟刪除照片權限：
       </p>
-      <input id="customUrlInput" type="url" placeholder="https://你的帳號.github.io/library-checkin/" class="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#141829] bg-white font-en-typewriter text-xs mb-4" />
-      <div class="flex justify-end gap-2">
-        <button onclick="closeQrSettings()" class="retro-btn px-4 py-2 rounded-xl bg-white font-bold text-sm cursor-pointer">取消 / Cancel</button>
-        <button onclick="saveCustomQrUrl()" class="retro-btn px-4 py-2 rounded-xl bg-[#2ec4b6] font-black text-sm cursor-pointer">儲存 / Save</button>
+      <input id="adminPassInput" type="password" inputmode="numeric" maxlength="10" placeholder="請輸入密碼 / Passcode" class="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#141829] bg-white font-en font-bold text-base mb-2 focus:outline-none focus:ring-2 focus:ring-[#ff5a36]" onkeydown="if(event.key==='Enter') verifyAdminPasscode()" />
+      <p id="adminPassError" class="hidden text-xs font-black text-[#ff5a36] mb-3">密碼錯誤，請重新輸入！ / Incorrect Passcode!</p>
+      <div class="flex justify-end gap-2 mt-2">
+        <button onclick="closeAdminModal()" class="retro-btn px-4 py-2 rounded-xl bg-white font-bold text-xs sm:text-sm cursor-pointer">取消 / <span class="font-en">Cancel</span></button>
+        <button onclick="verifyAdminPasscode()" class="retro-btn px-4 py-2 rounded-xl bg-[#2ec4b6] font-black text-xs sm:text-sm cursor-pointer">確認開啟 / <span class="font-en">Unlock</span></button>
       </div>
     </div>
+  </div>
+
+  <!-- ==================== 確認刪除對話框 Modal ==================== -->
+  <div id="confirmActionModal" class="fixed inset-0 z-50 hidden bg-[#0b1026]/85 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="retro-box rounded-3xl p-6 max-w-sm w-full text-center">
+      <h3 id="confirmModalTitle" class="text-xl font-black text-[#141829] mb-2">確認刪除？</h3>
+      <p id="confirmModalDesc" class="text-xs sm:text-sm font-bold text-[#141829]/85 mb-5">刪除後所有裝置都會同步移除。</p>
+      <div class="flex justify-center gap-3">
+        <button onclick="closeConfirmModal()" class="retro-btn px-5 py-2.5 rounded-xl bg-white font-bold text-sm cursor-pointer">取消 / <span class="font-en">Cancel</span></button>
+        <button id="confirmModalExecBtn" class="retro-btn px-5 py-2.5 rounded-xl bg-[#ff5a36] text-white font-black text-sm cursor-pointer">確認刪除 / <span class="font-en">Delete</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 系統提示訊息條 (取代 alert) ==================== -->
+  <div id="toastBanner" class="fixed top-4 left-1/2 -translate-x-1/2 z-[60] hidden px-5 py-2.5 rounded-2xl bg-[#141829] text-[#ffb703] border-2 border-[#ffb703] shadow-[4px_4px_0px_#ff5a36] text-xs sm:text-sm font-black text-center">
   </div>
 
   <canvas id="captureCanvas" class="hidden"></canvas>
 
   <script>
-    // ==================== Firebase Realtime Database 雲端即時設定 ====================
-    const FIREBASE_DB_URL = 'https://library-checkin-bd250-default-rtdb.firebaseio.com';
-    const POSTS_ENDPOINT = `${FIREBASE_DB_URL}/posts.json`;
-    const STORAGE_KEY = 'space_intel_library_posts_v2';
-    const QR_URL_KEY = 'space_intel_custom_qr_url_v2';
+    // ==================== Firebase 即時資料庫連線設定 ====================
+    const FIREBASE_DB_URL = "https://library-checkin-bd250-default-rtdb.firebaseio.com";
+    const LOCAL_BACKUP_KEY = "kachi_space_intel_backup_v1";
+    const ADMIN_PASSCODE = "8888"; // 館員管理員密碼
 
-    function createDemoSvgDataUrl(bg, emoji1, emoji2, title) {
+    let db = null;
+    let checkinsRef = null;
+    let isCloudConnected = false;
+    let isAdminMode = false;
+
+    // 專屬手繪復古太空向量徽章字典 (替代 Emoji)
+    const ROLE_BADGES_SVG = {
+      'badge-junior': `<svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" fill="#FFB703" stroke="#FAF3E0" stroke-width="2"/><circle cx="9" cy="12" r="2.5" fill="#141829"/><circle cx="15" cy="12" r="2.5" fill="#141829"/><line x1="11.5" y1="12" x2="12.5" y2="12" stroke="#141829" stroke-width="2"/></svg>`,
+      'badge-parent': `<svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none"><rect x="8" y="8" width="8" height="8" rx="2" fill="#2EC4B6" stroke="#FAF3E0" stroke-width="2"/><line x1="3" y1="12" x2="8" y2="12" stroke="#FFB703" stroke-width="2.5"/><line x1="16" y1="12" x2="21" y2="12" stroke="#FFB703" stroke-width="2.5"/></svg>`,
+      'badge-staff': `<svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none"><path d="M5 17C5 11 9 7 15 7" stroke="#2EC4B6" stroke-width="2.5" stroke-linecap="round"/><path d="M9 17C9 13.5 11.5 11 15 11" stroke="#FFB703" stroke-width="2.5" stroke-linecap="round"/><circle cx="15" cy="17" r="2.5" fill="#FF5A36"/></svg>`,
+      'badge-alumni': `<svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none"><path d="M12 3C15 7 16 11 16 16H8C8 11 9 7 12 3Z" fill="#FF5A36" stroke="#FAF3E0" stroke-width="2"/><path d="M8 16L5 19H19L16 16" fill="#FFB703"/></svg>`,
+      'badge-guest': `<svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="14" rx="9" ry="4" fill="#2EC4B6" stroke="#FAF3E0" stroke-width="2"/><path d="M7 13C7 9.5 9 7 12 7C15 7 17 9.5 17 13" fill="#FFB703"/></svg>`
+    };
+
+    function createDemoSvgDataUrl(bg, titleEn, subtitleZh) {
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="480" viewBox="0 0 640 480">
         <rect width="640" height="480" fill="${bg}"/>
-        <circle cx="110" cy="95" r="42" fill="#ffb703" opacity="0.85"/>
-        <circle cx="530" cy="380" r="65" fill="#2ec4b6" opacity="0.45"/>
-        <path d="M0 390 Q320 320 640 390 L640 480 L0 480 Z" fill="#141829" opacity="0.25"/>
-        <text x="320" y="215" font-size="115" text-anchor="middle" dominant-baseline="middle">${emoji1}${emoji2}</text>
-        <rect x="110" y="328" width="420" height="48" rx="24" fill="#141829"/>
-        <text x="320" y="358" font-family="Courier New, monospace" font-weight="bold" font-size="19" fill="#faf3e0" text-anchor="middle">${title}</text>
+        <circle cx="115" cy="95" r="44" fill="#ffb703"/>
+        <ellipse cx="115" cy="95" rx="74" ry="18" transform="rotate(-20 115 95)" fill="none" stroke="#faf3e0" stroke-width="5"/>
+        <circle cx="535" cy="375" r="65" fill="#2ec4b6" opacity="0.35"/>
+        <g transform="translate(275, 95)">
+          <path d="M45 10C68 38 74 72 74 115H16C16 72 22 38 45 10Z" fill="#FAF3E0" stroke="#141829" stroke-width="5"/>
+          <path d="M45 10C56 24 62 36 65 48H25C28 36 34 24 45 10Z" fill="#FF5A36" stroke="#141829" stroke-width="4"/>
+          <circle cx="45" cy="76" r="14" fill="#2EC4B6" stroke="#141829" stroke-width="4"/>
+          <path d="M16 95L2 122H16V95Z" fill="#FFB703" stroke="#141829" stroke-width="4"/>
+          <path d="M74 95L88 122H74V95Z" fill="#FFB703" stroke="#141829" stroke-width="4"/>
+        </g>
+        <rect x="120" y="295" width="400" height="54" rx="27" fill="#141829" stroke="#FFB703" stroke-width="3"/>
+        <text x="320" y="328" font-family="monospace" font-weight="bold" font-size="20" fill="#FFB703" text-anchor="middle">${titleEn}</text>
+        <text x="320" y="388" font-family="sans-serif" font-weight="bold" font-size="22" fill="#FAF3E0" text-anchor="middle">${subtitleZh}</text>
       </svg>`;
       return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
     }
 
-    const DEFAULT_POSTS = [
+    const DEFAULT_DEMO_POSTS = [
       {
         id: 'demo-1',
-        name: '指揮官小宇 / Cmdr. Yu',
+        name: '指揮官小宇 / Commander Yu',
         role: '館內情報員',
-        roleEn: 'Station Librarian',
-        roleIcon: '📡',
+        roleEn: 'Library Crew',
+        badgeKey: 'badge-staff',
         frame: 'frame-cream',
-        message: '歡迎來到圖書館太空情報站！ / Welcome to the Library Space Intel Station! 🚀📚',
+        message: '歡迎來到嘉智圖書館太空情報站！一起探索閱讀與公民知識宇宙！ / Welcome to Ka Chi Space Intel Station!',
         time: '09:30',
-        timestamp: 1000,
         likes: 18,
-        image: createDemoSvgDataUrl('#1e2952', '📡', '🚀', 'SECTOR 01 // SPACE INTEL STATION')
+        timestamp: 1000,
+        image: createDemoSvgDataUrl('#1e2952', 'KA CHI STATION // SECTOR 01', '嘉智校園開放日 · 圖書館太空情報站')
       },
       {
         id: 'demo-2',
-        name: '星際小晴 / Agent Qing',
+        name: '星際探索家小晴 / Explorer Ching',
         role: '實習情報員',
         roleEn: 'Junior Agent',
-        roleIcon: '🕵️',
+        badgeKey: 'badge-junior',
         frame: 'frame-gold',
-        message: '成功潛入太空情報站，科幻好書超豐富！ / Infiltrated the Space Station! ✨',
+        message: '成功潛入太空情報站，圖書館的跨域展覽超精彩！ / Mission accomplished at the library!',
         time: '10:05',
-        timestamp: 2000,
         likes: 24,
-        image: createDemoSvgDataUrl('#2b1e4a', '🕵️', '🪐', 'MISSION COMPLETE // CHECKED IN')
-      },
-      {
-        id: 'demo-3',
-        name: '陳爸爸與小星 / Chen Family',
-        role: '星際家長官',
-        roleEn: 'Space Parent',
-        roleIcon: '🛰️',
-        frame: 'frame-mint',
-        message: '親子一起來校園開放日闖關！ / Family check-in on School Open Day! 🛸',
-        time: '10:22',
-        timestamp: 3000,
-        likes: 15,
-        image: createDemoSvgDataUrl('#163840', '🛰️', '👾', 'FAMILY CREW // OPEN DAY 2026')
+        timestamp: 2000,
+        image: createDemoSvgDataUrl('#2b1e4a', 'MISSION COMPLETE // AGENT 02', '圖書館 × 公民與社會發展 × 國民教育')
       }
     ];
 
@@ -576,25 +677,26 @@
     let selectedFilterClass = 'filter-none';
     let selectedRole = '實習情報員';
     let selectedRoleEn = 'Junior Agent';
-    let selectedRoleIcon = '🕵️';
-    let isCloudOnline = true;
+    let selectedBadgeKey = 'badge-junior';
 
-    // 閒置輪播與雲端輪詢計時器
     let idleTimer = null;
     let slideshowInterval = null;
     let currentSlideIdx = 0;
-    let lastPostsSignature = '';
 
-    // ==================== 初始化 ====================
+    function showToast(msg) {
+      const banner = document.getElementById('toastBanner');
+      banner.textContent = msg;
+      banner.classList.remove('hidden');
+      clearTimeout(banner._timer);
+      banner._timer = setTimeout(() => {
+        banner.classList.add('hidden');
+      }, 3200);
+    }
+
+    // ==================== 初始化與 Firebase 監聽 ====================
     window.addEventListener('DOMContentLoaded', () => {
-      loadLocalFallback();
-      renderWall();
-      initQrCode();
+      initFirebaseSync();
       resetIdleTimer();
-
-      // 立即向 Firebase 拉取最新雲端資料，並每 2.5 秒自動輪詢同步
-      fetchCloudPosts();
-      setInterval(fetchCloudPosts, 2500);
 
       ['click', 'touchstart', 'keydown', 'mousemove'].forEach(evt => {
         window.addEventListener(evt, () => {
@@ -605,112 +707,169 @@
       });
     });
 
-    function loadLocalFallback() {
+    function initFirebaseSync() {
       try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) {
-          posts = JSON.parse(saved);
-        } else {
-          posts = [...DEFAULT_POSTS];
-        }
-      } catch (e) {
-        posts = [...DEFAULT_POSTS];
-      }
-    }
+        firebase.initializeApp({ databaseURL: FIREBASE_DB_URL });
+        db = firebase.database();
+        checkinsRef = db.ref('checkins');
 
-    function saveLocalFallback() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(posts.slice(0, 30)));
-      } catch (e) {
-        // 忽略本機空間上限錯誤
-      }
-    }
+        checkinsRef.limitToLast(60).on('value', (snapshot) => {
+          isCloudConnected = true;
+          updateSyncStatus(true);
 
-    function updateCloudBadge(online) {
-      isCloudOnline = online;
-      const badge = document.getElementById('cloudStatusBadge');
-      if (!badge) return;
-      if (online) {
-        badge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#2ec4b6]/25 border-2 border-[#141829] text-xs font-bold';
-        badge.innerHTML = '<span>🟢 雲端即時同步中 / LIVE CLOUD SYNC</span>';
-      } else {
-        badge.className = 'inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#ffb703]/40 border-2 border-[#141829] text-xs font-bold';
-        badge.innerHTML = '<span>🟡 離線本機模式 / OFFLINE LOCAL MODE</span>';
-      }
-    }
-
-    // ==================== Firebase Realtime Database REST 讀寫 ====================
-    async function fetchCloudPosts() {
-      try {
-        const res = await fetch(POSTS_ENDPOINT, { cache: 'no-store' });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
-        const data = await res.json();
-        updateCloudBadge(true);
-
-        if (data && typeof data === 'object') {
-          const cloudList = Object.entries(data).map(([fbKey, item]) => ({
-            ...item,
-            fbKey
-          }));
-          // 依最新時間排序
-          cloudList.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-
-          const signature = JSON.stringify(cloudList.map(p => `${p.fbKey}:${p.likes || 0}`));
-          if (signature !== lastPostsSignature) {
-            lastPostsSignature = signature;
-            posts = cloudList;
-            saveLocalFallback();
-            renderWall();
+          const data = snapshot.val();
+          if (data) {
+            const list = Object.keys(data).map(key => ({
+              id: key,
+              ...data[key]
+            }));
+            list.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+            posts = list;
+            localStorage.setItem(LOCAL_BACKUP_KEY, JSON.stringify(posts));
+          } else {
+            posts = [...DEFAULT_DEMO_POSTS];
           }
-        } else if (data === null && lastPostsSignature === '') {
-          // 雲端尚無資料時，顯示預設示範卡片
-          posts = [...DEFAULT_POSTS];
           renderWall();
-        }
-      } catch (err) {
-        updateCloudBadge(false);
-      }
-    }
-
-    async function pushPostToCloud(newPost) {
-      try {
-        const res = await fetch(POSTS_ENDPOINT, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(newPost)
+        }, (error) => {
+          console.warn('Firebase 讀取錯誤，切換為本機備援模式:', error);
+          fallbackToLocal();
         });
-        if (!res.ok) throw new Error('POST failed');
-        updateCloudBadge(true);
-        await fetchCloudPosts();
-      } catch (err) {
-        updateCloudBadge(false);
-        posts.unshift(newPost);
-        saveLocalFallback();
-        renderWall();
+      } catch (e) {
+        console.warn('Firebase 初始化異常，使用本機模式:', e);
+        fallbackToLocal();
       }
     }
 
-    async function likePost(id, fbKey) {
-      const target = posts.find(p => p.id === id || (fbKey && p.fbKey === fbKey));
-      if (!target) return;
-
-      const updatedLikes = (target.likes || 0) + 1;
-      target.likes = updatedLikes;
-      renderWall();
-
-      if (target.fbKey) {
-        try {
-          await fetch(`${FIREBASE_DB_URL}/posts/${target.fbKey}.json`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ likes: updatedLikes })
-          });
-        } catch (err) {
-          saveLocalFallback();
-        }
-      } else {
-        saveLocalFallback();
+    function fallbackToLocal() {
+      isCloudConnected = false;
+      updateSyncStatus(false);
+      try {
+        const saved = localStorage.getItem(LOCAL_BACKUP_KEY);
+        posts = saved ? JSON.parse(saved) : [...DEFAULT_DEMO_POSTS];
+      } catch (e) {
+        posts = [...DEFAULT_DEMO_POSTS];
       }
+      renderWall();
+    }
+
+    function updateSyncStatus(connected) {
+      const dot = document.getElementById('syncDot');
+      const text = document.getElementById('syncText');
+      if (connected) {
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-[#2ec4b6] animate-ping';
+        text.innerHTML = '雲端即時同步中 / <span class="font-en">LIVE CLOUD SYNC</span>';
+      } else {
+        dot.className = 'w-2.5 h-2.5 rounded-full bg-[#ffb703]';
+        text.innerHTML = '本機展示模式 / <span class="font-en">LOCAL MODE</span>';
+      }
+    }
+
+    // ==================== 館員管理員模式 (自訂 Modal 密碼驗證與刪照) ====================
+    function openAdminModal() {
+      if (isAdminMode) {
+        isAdminMode = false;
+        updateAdminUI();
+        renderWall();
+        showToast('已退出館員管理模式 / Admin Mode Exited');
+        return;
+      }
+      document.getElementById('adminPassInput').value = '';
+      document.getElementById('adminPassError').classList.add('hidden');
+      document.getElementById('adminAuthModal').classList.remove('hidden');
+      setTimeout(() => document.getElementById('adminPassInput').focus(), 100);
+    }
+
+    function closeAdminModal() {
+      document.getElementById('adminAuthModal').classList.add('hidden');
+    }
+
+    function verifyAdminPasscode() {
+      const input = document.getElementById('adminPassInput').value.trim();
+      if (input === ADMIN_PASSCODE) {
+        isAdminMode = true;
+        closeAdminModal();
+        updateAdminUI();
+        renderWall();
+        showToast('已開啟館員管理模式！卡片右上角可點擊刪除 / Admin Mode Enabled');
+      } else {
+        document.getElementById('adminPassError').classList.remove('hidden');
+      }
+    }
+
+    function updateAdminUI() {
+      const topBtn = document.getElementById('adminTopBtn');
+      const topLabel = document.getElementById('adminTopLabel');
+      const clearAllBtn = document.getElementById('adminClearAllBtn');
+      const footerLabel = document.getElementById('adminFooterLabel');
+
+      if (isAdminMode) {
+        topBtn.classList.remove('bg-[#141829]/10');
+        topBtn.classList.add('bg-[#ff5a36]', 'text-white');
+        topLabel.innerHTML = '退出管理模式 / <span class="font-en">EXIT ADMIN</span>';
+        clearAllBtn.classList.remove('hidden');
+        footerLabel.textContent = '退出館員管理模式 / Exit Admin Mode';
+      } else {
+        topBtn.classList.add('bg-[#141829]/10');
+        topBtn.classList.remove('bg-[#ff5a36]', 'text-white');
+        topLabel.innerHTML = '館員管理 / <span class="font-en">ADMIN</span>';
+        clearAllBtn.classList.add('hidden');
+        footerLabel.textContent = '切換館員管理模式 / Toggle Admin Mode';
+      }
+    }
+
+    function openConfirmModal(title, desc, onConfirm) {
+      document.getElementById('confirmModalTitle').textContent = title;
+      document.getElementById('confirmModalDesc').textContent = desc;
+      const execBtn = document.getElementById('confirmModalExecBtn');
+      execBtn.onclick = () => {
+        closeConfirmModal();
+        onConfirm();
+      };
+      document.getElementById('confirmActionModal').classList.remove('hidden');
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirmActionModal').classList.add('hidden');
+    }
+
+    function deletePost(id) {
+      if (!isAdminMode) return;
+      openConfirmModal(
+        '確認刪除此情報照片？ / Delete Photo?',
+        '刪除後所有裝置的大螢幕與手機都會同步移除這張照片。',
+        () => {
+          if (isCloudConnected && checkinsRef && !id.startsWith('demo-')) {
+            checkinsRef.child(id).remove()
+              .then(() => showToast('已從雲端刪除該張照片 / Photo Deleted'))
+              .catch(err => showToast('雲端刪除失敗：' + err.message));
+          } else {
+            posts = posts.filter(p => p.id !== id);
+            localStorage.setItem(LOCAL_BACKUP_KEY, JSON.stringify(posts));
+            renderWall();
+            showToast('已刪除該張照片 / Photo Deleted');
+          }
+        }
+      );
+    }
+
+    function requestClearAll() {
+      if (!isAdminMode) return;
+      openConfirmModal(
+        '清空全部雲端照片？ / Clear ALL Posts?',
+        '警告：確定要清空目前「全部」打卡照片嗎？此動作無法復原！',
+        () => {
+          if (isCloudConnected && checkinsRef) {
+            checkinsRef.remove()
+              .then(() => showToast('已清空全部雲端資料！ / All Cleared'))
+              .catch(err => showToast('清空失敗：' + err.message));
+          } else {
+            posts = [];
+            localStorage.removeItem(LOCAL_BACKUP_KEY);
+            renderWall();
+            showToast('已清空全部資料！ / All Cleared');
+          }
+        }
+      );
     }
 
     // ==================== 渲染照片牆 ====================
@@ -725,51 +884,58 @@
 
       if (filtered.length === 0) {
         wall.innerHTML = `
-          <div class="col-span-full retro-box rounded-3xl p-10 text-center">
-            <div class="text-5xl mb-3">🛸</div>
-            <p class="text-xl font-black mb-1">此情報分隊尚無回報紀錄 / No records in this division yet</p>
-            <p class="text-sm font-bold text-[#141829]/75">快點擊右上角「📡 情報員拍照報到 / CHECK IN」成為第一位登陸者吧！</p>
+          <div class="col-span-full retro-box rounded-3xl p-8 sm:p-10 text-center">
+            <p class="text-lg sm:text-xl font-black mb-1">這個情報分隊目前還沒有回報紀錄</p>
+            <p class="font-en text-xs font-bold text-[#ff5a36] mb-2">NO TRANSMISSIONS IN THIS SECTOR YET</p>
+            <p class="text-xs sm:text-sm font-bold text-[#141829]/75">快點擊上方圓形「情報員拍照報到」按鈕成為第一位登陸者吧！</p>
           </div>
         `;
         return;
       }
 
       wall.innerHTML = filtered.map((post, index) => {
-        const tilt = index % 3 === 0 ? 'rotate-[-1deg]' : (index % 3 === 1 ? 'rotate-[1deg]' : 'rotate-0');
-        const roleEnText = post.roleEn ? ` / ${escapeHtml(post.roleEn)}` : '';
+        const tilt = index % 3 === 0 ? 'md:rotate-[-1deg]' : (index % 3 === 1 ? 'md:rotate-[1deg]' : 'rotate-0');
+        const badgeSvg = ROLE_BADGES_SVG[post.badgeKey] || ROLE_BADGES_SVG['badge-junior'];
+        const deleteBtnHtml = isAdminMode ? `
+          <button onclick="deletePost('${post.id}')" class="absolute top-2 right-2 z-20 px-3 py-1.5 rounded-xl bg-[#ff5a36] text-white border-2 border-[#141829] shadow-[2px_2px_0px_#141829] text-xs font-black hover:scale-105 cursor-pointer">
+            刪除 / <span class="font-en">DEL</span>
+          </button>
+        ` : '';
+
         return `
-          <article class="${post.frame || 'frame-cream'} border-[3.5px] border-[#141829] shadow-[6px_6px_0px_#141829] rounded-2xl p-3.5 flex flex-col justify-between transition-transform hover:scale-[1.02] hover:rotate-0 ${tilt}">
+          <article class="${post.frame || 'frame-cream'} relative border-[3.5px] border-[#141829] shadow-[6px_6px_0px_#141829] rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between transition-transform hover:scale-[1.01] hover:rotate-0 ${tilt}">
+            ${deleteBtnHtml}
             <div>
               <!-- 頂部情報員身分與時間 -->
-              <div class="flex items-center justify-between gap-1 mb-2">
-                <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#141829] text-[#faf3e0] text-[11px] font-bold">
-                  <span>${post.roleIcon || '🕵️'}</span>
-                  <span>${escapeHtml(post.role)}${roleEnText}</span>
+              <div class="flex items-center justify-between gap-1 mb-2.5 pr-1">
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#141829] text-[#faf3e0] text-xs font-bold">
+                  ${badgeSvg}
+                  <span>${escapeHtml(post.role)} / <span class="font-en text-[10px] text-[#ffb703]">${escapeHtml(post.roleEn || '')}</span></span>
                 </span>
-                <span class="font-en-typewriter text-[11px] font-bold text-[#141829]/70">${escapeHtml(post.time || '')}</span>
+                <span class="font-en text-xs font-bold text-[#141829]/75">${escapeHtml(post.time || '')}</span>
               </div>
 
-              <!-- 拍立得照片區（乾淨無遮擋） -->
+              <!-- 拍立得照片區 -->
               <div class="relative rounded-xl overflow-hidden border-[3px] border-[#141829] bg-[#141829] aspect-[4/3] mb-3">
-                <img src="${post.image}" alt="${escapeHtml(post.name)}" class="w-full h-full object-cover" />
+                <img src="${post.image}" alt="${escapeHtml(post.name)}" class="w-full h-full object-cover" loading="lazy" />
               </div>
 
               <!-- 暱稱與留言 -->
               <div class="mb-3">
                 <div class="font-black text-base sm:text-lg text-[#141829] leading-snug">${escapeHtml(post.name)}</div>
-                <p class="text-xs sm:text-sm font-bold text-[#141829]/85 mt-1 break-words leading-relaxed">「${escapeHtml(post.message)}」</p>
+                <p class="text-sm font-bold text-[#141829]/85 mt-1 break-words leading-relaxed">「${escapeHtml(post.message)}」</p>
               </div>
             </div>
 
-            <!-- 底部地點標記與致敬按讚 -->
-            <div class="pt-2.5 border-t-2 border-dashed border-[#141829]/30 flex items-center justify-between gap-2">
+            <!-- 底部地點標記與按讚致敬 -->
+            <div class="pt-2.5 border-t-2 border-dashed border-[#141829]/30 flex items-center justify-between gap-1">
               <div class="text-[11px] font-black text-[#141829]/80 leading-tight">
-                <div>📡 圖書館 · 太空情報站</div>
-                <div class="font-en-typewriter text-[10px] text-[#141829]/65">Library Space Intel Station</div>
+                嘉智圖書館 · 太空情報站
+                <span class="block font-en text-[9px] text-[#141829]/60">KA CHI SPACE INTEL</span>
               </div>
-              <button onclick="likePost('${escapeHtml(post.id || '')}', '${escapeHtml(post.fbKey || '')}')" class="retro-btn shrink-0 px-2.5 py-1.5 rounded-xl bg-white hover:bg-[#ffb703] text-xs font-black flex items-center gap-1 cursor-pointer">
-                <span>⭐</span>
-                <span>致敬 / Salute <span class="font-en-typewriter">${post.likes || 0}</span></span>
+              <button onclick="likePost('${post.id}')" class="retro-btn px-3 py-1.5 rounded-xl bg-white hover:bg-[#ffb703] text-xs font-black flex items-center gap-1.5 cursor-pointer shrink-0">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="#FFB703" stroke="#141829" stroke-width="2.2"><polygon points="12,2 15,9 22,9 16.5,14 18.5,21 12,17 5.5,21 7.5,14 2,9 9,9"/></svg>
+                <span>致敬 / <span class="font-en">Salute ${post.likes || 0}</span></span>
               </button>
             </div>
           </article>
@@ -789,6 +955,20 @@
         }
       });
       renderWall();
+    }
+
+    function likePost(id) {
+      const target = posts.find(p => p.id === id);
+      if (!target) return;
+      const newLikes = (target.likes || 0) + 1;
+
+      if (isCloudConnected && checkinsRef && !id.startsWith('demo-')) {
+        checkinsRef.child(id).update({ likes: newLikes }).catch(() => {});
+      } else {
+        target.likes = newLikes;
+        localStorage.setItem(LOCAL_BACKUP_KEY, JSON.stringify(posts));
+        renderWall();
+      }
     }
 
     // ==================== 相機與拍照邏輯 ====================
@@ -862,18 +1042,15 @@
       const canvas = document.getElementById('captureCanvas');
       const flash = document.getElementById('flashOverlay');
 
-      // 閃光燈特效
       flash.classList.remove('flash-active');
       void flash.offsetWidth;
       flash.classList.add('flash-active');
 
-      // 壓縮為適中尺寸與品質，確保 Firebase 傳輸秒速同步
       const width = 560;
       const height = 420;
       canvas.width = width;
       canvas.height = height;
       const ctx = canvas.getContext('2d');
-
       ctx.filter = getCanvasFilterString(selectedFilterClass);
 
       if (videoStream && video.videoWidth > 0) {
@@ -896,7 +1073,7 @@
         ctx.drawImage(video, sx, sy, sw, sh, 0, 0, width, height);
         ctx.restore();
       } else {
-        const fallbackUrl = createDemoSvgDataUrl('#1c2541', selectedRoleIcon, '📡', 'SPACE INTEL // CHECK IN');
+        const fallbackUrl = createDemoSvgDataUrl('#1c2541', 'KA CHI INTEL // AGENT', '嘉智圖書館 · 太空情報員報到');
         showCapturedImage(fallbackUrl);
         return;
       }
@@ -982,10 +1159,10 @@
       }
     }
 
-    function selectRole(role, roleEn, icon, btnEl) {
-      selectedRole = role;
+    function selectRole(roleZh, roleEn, badgeKey, btnEl) {
+      selectedRole = roleZh;
       selectedRoleEn = roleEn;
-      selectedRoleIcon = icon;
+      selectedBadgeKey = badgeKey;
       document.querySelectorAll('.role-btn').forEach(b => {
         b.classList.remove('bg-[#ffb703]', 'font-black');
         b.classList.add('bg-white');
@@ -998,7 +1175,7 @@
       document.getElementById('messageInput').value = text;
     }
 
-    // ==================== 發布情報上牆 ====================
+    // ==================== 發布情報上牆 (雲端即時寫入) ====================
     async function publishCheckIn() {
       if (!capturedImageDataUrl) {
         takePhotoNow();
@@ -1006,38 +1183,49 @@
 
       const publishBtn = document.getElementById('publishBtn');
       publishBtn.disabled = true;
-      publishBtn.innerHTML = '<span>⏳</span><span>雲端傳送中... / TRANSMITTING...</span>';
+      publishBtn.innerHTML = '<span>傳送中... / <span class="font-en">TRANSMITTING...</span></span>';
 
       const rawName = document.getElementById('agentNameInput').value.trim();
       const randomNum = Math.floor(100 + Math.random() * 900);
-      const finalName = rawName || `星際情報員 / Agent #${randomNum}`;
+      const finalName = rawName || `星際情報員 #${randomNum} / Agent #${randomNum}`;
 
       const rawMsg = document.getElementById('messageInput').value.trim();
-      const finalMsg = rawMsg || '成功潛入太空情報站！ / Entered the Space Intel Station! 📡';
+      const finalMsg = rawMsg || '成功潛入太空情報站，圖書館超酷！ / Space Intel Station rocks!';
 
       const frame = document.getElementById('frameSelect').value;
-
       const now = new Date();
       const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
-      const newPost = {
-        id: 'post-' + Date.now() + '-' + randomNum,
+      const newPostData = {
         name: finalName,
         role: selectedRole,
         roleEn: selectedRoleEn,
-        roleIcon: selectedRoleIcon,
+        badgeKey: selectedBadgeKey,
         frame,
         message: finalMsg,
         time: timeStr,
-        timestamp: Date.now(),
         likes: 1,
+        timestamp: Date.now(),
         image: capturedImageDataUrl
       };
 
-      await pushPostToCloud(newPost);
-
-      publishBtn.disabled = false;
-      publishBtn.innerHTML = '<span>🚀</span><span>傳送情報！登上電視牆 / TRANSMIT TO TV WALL</span>';
+      try {
+        if (isCloudConnected && checkinsRef) {
+          await checkinsRef.push(newPostData);
+        } else {
+          posts.unshift({ id: 'local-' + Date.now(), ...newPostData });
+          localStorage.setItem(LOCAL_BACKUP_KEY, JSON.stringify(posts));
+          renderWall();
+        }
+      } catch (err) {
+        console.warn('雲端寫入異常，改存本機:', err);
+        posts.unshift({ id: 'local-' + Date.now(), ...newPostData });
+        localStorage.setItem(LOCAL_BACKUP_KEY, JSON.stringify(posts));
+        renderWall();
+      } finally {
+        publishBtn.disabled = false;
+        publishBtn.innerHTML = '<span>傳送情報上牆！ / <span class="font-en">TRANSMIT!</span></span>';
+      }
 
       document.getElementById('agentNameInput').value = '';
       document.getElementById('messageInput').value = '';
@@ -1061,8 +1249,8 @@
       clearTimeout(idleTimer);
       idleTimer = setTimeout(() => {
         const cameraOpen = !document.getElementById('cameraModal').classList.contains('hidden');
-        const qrOpen = !document.getElementById('qrSettingsModal').classList.contains('hidden');
-        if (!cameraOpen && !qrOpen && posts.length > 0) {
+        const adminOpen = !document.getElementById('adminAuthModal').classList.contains('hidden');
+        if (!cameraOpen && !adminOpen && posts.length > 0) {
           startSlideshow();
         }
       }, 15000);
@@ -1090,7 +1278,7 @@
     function renderSlide() {
       const post = posts[currentSlideIdx];
       if (!post) return;
-      const roleEnText = post.roleEn ? ` / ${escapeHtml(post.roleEn)}` : '';
+      const badgeSvg = ROLE_BADGES_SVG[post.badgeKey] || ROLE_BADGES_SVG['badge-junior'];
       const container = document.getElementById('slideshowCardContainer');
       container.innerHTML = `
         <div class="${post.frame || 'frame-cream'} border-4 border-[#141829] shadow-[10px_10px_0px_#ffb703] rounded-3xl p-5 sm:p-8 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
@@ -1100,66 +1288,19 @@
           <div class="md:col-span-5 flex flex-col justify-between space-y-4">
             <div>
               <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#141829] text-[#ffb703] text-xs sm:text-sm font-black mb-3">
-                <span>${post.roleIcon || '🕵️'}</span>
-                <span>${escapeHtml(post.role)}${roleEnText}</span>
+                ${badgeSvg}
+                <span>${escapeHtml(post.role)} / <span class="font-en">${escapeHtml(post.roleEn || '')}</span></span>
               </span>
               <h3 class="text-2xl sm:text-3xl font-black text-[#141829] mb-3">${escapeHtml(post.name)}</h3>
               <p class="text-lg sm:text-xl font-bold text-[#141829]/90 leading-relaxed">「${escapeHtml(post.message)}」</p>
             </div>
             <div class="pt-4 border-t-2 border-dashed border-[#141829]/30 flex items-center justify-between text-xs sm:text-sm font-black">
-              <div>
-                <div>📡 圖書館 · 太空情報站</div>
-                <div class="font-en-typewriter text-[11px] text-[#141829]/70">Library Space Intel Station</div>
-              </div>
-              <span>⭐ ${post.likes || 0} Salute</span>
+              <span>嘉智圖書館 · 太空情報站</span>
+              <span class="font-en">Salute ${post.likes || 0}</span>
             </div>
           </div>
         </div>
       `;
-    }
-
-    // ==================== QR Code 生成與設定 ====================
-    function initQrCode() {
-      const savedUrl = localStorage.getItem(QR_URL_KEY);
-      const targetUrl = savedUrl || window.location.href;
-      renderQr(targetUrl);
-    }
-
-    function renderQr(url) {
-      const box = document.getElementById('qrcodeBox');
-      box.innerHTML = '';
-      if (typeof QRCode !== 'undefined') {
-        new QRCode(box, {
-          text: url,
-          width: 62,
-          height: 62,
-          colorDark: '#141829',
-          colorLight: '#ffffff',
-          correctLevel: QRCode.CorrectLevel.M
-        });
-      }
-    }
-
-    function openQrSettings() {
-      const savedUrl = localStorage.getItem(QR_URL_KEY) || '';
-      document.getElementById('customUrlInput').value = savedUrl;
-      document.getElementById('qrSettingsModal').classList.remove('hidden');
-    }
-
-    function closeQrSettings() {
-      document.getElementById('qrSettingsModal').classList.add('hidden');
-    }
-
-    function saveCustomQrUrl() {
-      const val = document.getElementById('customUrlInput').value.trim();
-      if (val) {
-        localStorage.setItem(QR_URL_KEY, val);
-        renderQr(val);
-      } else {
-        localStorage.removeItem(QR_URL_KEY);
-        renderQr(window.location.href);
-      }
-      closeQrSettings();
     }
 
     function escapeHtml(str) {
