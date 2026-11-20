@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>嘉智校園開放日 圖書館歡迎你！｜太空情報站</title>
+  <title>校園開放日 歡迎你來到嘉智圖書館！｜太空情報站</title>
   <!-- 復古打字機字體 (僅供英文與編號) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -42,47 +42,147 @@
       letter-spacing: 0.02em;
     }
 
-    /* 星空背景動畫 */
-    .starfield {
+    /* ==================== 動態太空背景系統 ==================== */
+    /* 1. 緩慢呼吸漂移的宇宙星雲光暈 */
+    .space-nebula {
+      position: fixed;
+      inset: -20%;
+      z-index: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 20% 25%, rgba(46, 196, 182, 0.16), transparent 45%),
+        radial-gradient(circle at 80% 30%, rgba(255, 90, 54, 0.14), transparent 48%),
+        radial-gradient(circle at 50% 75%, rgba(255, 183, 3, 0.12), transparent 50%);
+      animation: nebulaDrift 18s ease-in-out infinite alternate;
+    }
+
+    @keyframes nebulaDrift {
+      0% { transform: scale(1) translate(0, 0) rotate(0deg); }
+      100% { transform: scale(1.12) translate(-3%, 2%) rotate(4deg); }
+    }
+
+    /* 2. 遠景微光星空（慢速飄移 + 閃爍） */
+    .starfield-far {
       position: fixed;
       inset: 0;
       z-index: 0;
       pointer-events: none;
-      background:
-        radial-gradient(2px 2px at 25px 35px, #ffffff, rgba(0,0,0,0)),
-        radial-gradient(2px 2px at 90px 140px, #ffb703, rgba(0,0,0,0)),
-        radial-gradient(1.5px 1.5px at 170px 70px, #2ec4b6, rgba(0,0,0,0)),
-        radial-gradient(2.5px 2.5px at 260px 210px, #ffffff, rgba(0,0,0,0)),
-        radial-gradient(1.5px 1.5px at 320px 100px, #ff5a36, rgba(0,0,0,0));
-      background-size: 360px 260px;
-      animation: twinkle 6s infinite alternate ease-in-out;
+      background-image:
+        radial-gradient(1.5px 1.5px at 20px 30px, #ffffff, transparent),
+        radial-gradient(1.5px 1.5px at 110px 90px, #faf3e0, transparent),
+        radial-gradient(1px 1px at 210px 160px, #2ec4b6, transparent),
+        radial-gradient(1.5px 1.5px at 290px 40px, #ffb703, transparent),
+        radial-gradient(1px 1px at 340px 220px, #ffffff, transparent);
+      background-size: 380px 280px;
+      animation: starDriftFar 45s linear infinite, twinkle 4s ease-in-out infinite alternate;
     }
 
-    @keyframes twinkle {
-      0% { opacity: 0.65; }
-      100% { opacity: 1; }
-    }
-
-    /* 復古賽博透視網格地平線 */
-    .retro-grid {
+    /* 3. 近景亮星（較快視差飄移） */
+    .starfield-near {
       position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 24vh;
+      inset: 0;
       z-index: 0;
       pointer-events: none;
       background-image:
-        linear-gradient(to right, rgba(46, 196, 182, 0.22) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(46, 196, 182, 0.22) 1px, transparent 1px);
-      background-size: 40px 28px;
-      transform: perspective(360px) rotateX(60deg);
-      transform-origin: bottom center;
-      mask-image: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
-      -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+        radial-gradient(2.5px 2.5px at 55px 75px, #ffffff, transparent),
+        radial-gradient(2.5px 2.5px at 185px 210px, #ffb703, transparent),
+        radial-gradient(2px 2px at 310px 125px, #2ec4b6, transparent),
+        radial-gradient(2.5px 2.5px at 420px 290px, #ff5a36, transparent);
+      background-size: 480px 360px;
+      animation: starDriftNear 24s linear infinite, twinkle 2.8s ease-in-out 1s infinite alternate;
     }
 
-    /* 漂浮向量太空插畫動畫 */
+    @keyframes starDriftFar {
+      from { background-position: 0 0; }
+      to { background-position: -380px -280px; }
+    }
+
+    @keyframes starDriftNear {
+      from { background-position: 0 0; }
+      to { background-position: -480px -360px; }
+    }
+
+    @keyframes twinkle {
+      0% { opacity: 0.55; }
+      100% { opacity: 1; }
+    }
+
+    /* 4. 劃過夜空的復古流星 */
+    .shooting-star {
+      position: fixed;
+      top: 12%;
+      right: -120px;
+      width: 110px;
+      height: 2.5px;
+      background: linear-gradient(90deg, #ffb703, rgba(255, 255, 255, 0.8), transparent);
+      border-radius: 999px;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0;
+      transform: rotate(-28deg);
+      animation: shootAcross 8s ease-in infinite;
+    }
+    .shooting-star::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: -2px;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #ffffff;
+      box-shadow: 0 0 10px #ffb703, 0 0 18px #ff5a36;
+    }
+    .shooting-star.delay-2 {
+      top: 32%;
+      animation-delay: 4.2s;
+      animation-duration: 9.5s;
+    }
+
+    @keyframes shootAcross {
+      0% {
+        transform: translate(0, 0) rotate(-28deg);
+        opacity: 0;
+      }
+      4% {
+        opacity: 1;
+      }
+      18% {
+        transform: translate(-120vw, 62vh) rotate(-28deg);
+        opacity: 0;
+      }
+      100% {
+        transform: translate(-120vw, 62vh) rotate(-28deg);
+        opacity: 0;
+      }
+    }
+
+    /* 5. 前進式復古賽博透視網格地平線 */
+    .retro-grid {
+      position: fixed;
+      bottom: 0;
+      left: -10%;
+      right: -10%;
+      height: 26vh;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(to right, rgba(46, 196, 182, 0.28) 1.5px, transparent 1.5px),
+        linear-gradient(to bottom, rgba(46, 196, 182, 0.28) 1.5px, transparent 1.5px);
+      background-size: 44px 32px;
+      transform: perspective(340px) rotateX(62deg);
+      transform-origin: bottom center;
+      mask-image: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
+      -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.95), transparent);
+      animation: gridForward 2.4s linear infinite;
+    }
+
+    @keyframes gridForward {
+      from { background-position: 0 0; }
+      to { background-position: 0 32px; }
+    }
+
+    /* 6. 漂浮與巡航向量太空插畫動畫 */
     .float-slow {
       animation: floatY 5.5s ease-in-out infinite;
     }
@@ -90,8 +190,25 @@
       animation: floatY 7s ease-in-out 1.5s infinite;
     }
     @keyframes floatY {
-      0%, 100% { transform: translateY(0px) rotate(-3deg); }
-      50% { transform: translateY(-12px) rotate(3deg); }
+      0%, 100% { transform: translateY(0px) rotate(-4deg); }
+      50% { transform: translateY(-16px) rotate(5deg); }
+    }
+
+    /* 小火箭斜向巡航飛越背景 */
+    .rocket-cruise {
+      animation: rocketFly 22s linear infinite;
+    }
+    @keyframes rocketFly {
+      0% {
+        transform: translate(-15vw, 75vh) rotate(32deg) scale(0.9);
+        opacity: 0;
+      }
+      8% { opacity: 0.85; }
+      92% { opacity: 0.85; }
+      100% {
+        transform: translate(112vw, -18vh) rotate(32deg) scale(1.05);
+        opacity: 0;
+      }
     }
 
     @keyframes spinSlow {
@@ -163,15 +280,93 @@
     .flash-active {
       animation: cameraFlash 0.45s ease-out forwards;
     }
+
+    /* ==================== 電視牆輪播專屬動態舞台背景 ==================== */
+    .slideshow-stage {
+      background: radial-gradient(circle at center, rgba(16, 26, 66, 0.72) 0%, rgba(11, 16, 38, 0.88) 100%);
+    }
+
+    /* 高速星際躍遷星塵 */
+    .warp-stars-fast {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(2px 2px at 40px 60px, #ffffff, transparent),
+        radial-gradient(2.5px 2.5px at 150px 180px, #ffb703, transparent),
+        radial-gradient(2px 2px at 280px 90px, #2ec4b6, transparent),
+        radial-gradient(3px 3px at 390px 240px, #ff5a36, transparent),
+        radial-gradient(2px 2px at 460px 130px, #ffffff, transparent);
+      background-size: 520px 340px;
+      animation: warpSpeed 9s linear infinite, twinkle 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes warpSpeed {
+      from { background-position: 0 0; }
+      to { background-position: -520px -340px; }
+    }
+
+    /* 輪播背景巨大旋轉雷達星環 */
+    .radar-ring-outer {
+      position: absolute;
+      width: min(82vw, 720px);
+      height: min(82vw, 720px);
+      border-radius: 9999px;
+      border: 2.5px dashed rgba(46, 196, 182, 0.35);
+      box-shadow: 0 0 60px rgba(46, 196, 182, 0.12), inset 0 0 60px rgba(255, 183, 3, 0.08);
+      pointer-events: none;
+      animation: spinSlow 36s linear infinite;
+    }
+
+    .radar-ring-inner {
+      position: absolute;
+      width: min(62vw, 540px);
+      height: min(62vw, 540px);
+      border-radius: 9999px;
+      border: 2px dotted rgba(255, 183, 3, 0.35);
+      pointer-events: none;
+      animation: spinReverse 24s linear infinite;
+    }
+
+    @keyframes spinReverse {
+      0% { transform: rotate(360deg); }
+      100% { transform: rotate(0deg); }
+    }
+
+    /* 輪播卡片進場與懸浮呼吸動畫 */
+    @keyframes slideCardEnter {
+      0% {
+        opacity: 0;
+        transform: translateY(22px) scale(0.96);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0px) scale(1);
+      }
+    }
+
+    @keyframes cardFloatHover {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-7px); }
+    }
+
+    .slideshow-card-anim {
+      animation: slideCardEnter 0.55s cubic-bezier(0.22, 1, 0.36, 1) forwards,
+                 cardFloatHover 4.5s ease-in-out 0.55s infinite;
+    }
   </style>
 </head>
 <body class="selection:bg-[#ffb703] selection:text-[#141829]">
-  <!-- 背景星空與透視網格 -->
-  <div class="starfield"></div>
+  <!-- 多層次動態太空背景：星雲、遠近視差星空、流星、前進式透視網格 -->
+  <div class="space-nebula"></div>
+  <div class="starfield-far"></div>
+  <div class="starfield-near"></div>
+  <div class="shooting-star"></div>
+  <div class="shooting-star delay-2"></div>
   <div class="retro-grid"></div>
 
   <!-- 專屬手繪復古太空向量背景插畫 -->
-  <div class="fixed top-20 left-3 w-16 h-16 md:w-24 md:h-24 opacity-80 pointer-events-none float-slow z-0 select-none">
+  <div class="fixed top-20 left-3 w-16 h-16 md:w-24 md:h-24 opacity-85 pointer-events-none float-slow z-0 select-none">
     <!-- 手繪復古土星 SVG -->
     <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
       <circle cx="60" cy="60" r="30" fill="#FFB703" stroke="#141829" stroke-width="4"/>
@@ -182,7 +377,7 @@
     </svg>
   </div>
 
-  <div class="fixed top-48 right-3 w-14 h-14 md:w-20 md:h-20 opacity-80 pointer-events-none float-delay z-0 select-none">
+  <div class="fixed top-48 right-3 w-14 h-14 md:w-20 md:h-20 opacity-85 pointer-events-none float-delay z-0 select-none">
     <!-- 手繪復古軌道衛星 SVG -->
     <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
       <rect x="38" y="38" width="24" height="24" rx="4" fill="#FAF3E0" stroke="#141829" stroke-width="4"/>
@@ -192,6 +387,18 @@
       <line x1="62" y1="50" x2="68" y2="50" stroke="#141829" stroke-width="4"/>
       <path d="M50 38V24" stroke="#FAF3E0" stroke-width="4" stroke-linecap="round"/>
       <circle cx="50" cy="20" r="5" fill="#FF5A36" stroke="#141829" stroke-width="3"/>
+    </svg>
+  </div>
+
+  <!-- 斜向巡航飛越的復古太空小火箭 -->
+  <div class="fixed top-0 left-0 w-12 h-12 md:w-16 md:h-16 pointer-events-none rocket-cruise z-0 select-none">
+    <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M40 8C54 24 58 44 58 62H22C22 44 26 24 40 8Z" fill="#FAF3E0" stroke="#141829" stroke-width="4"/>
+      <path d="M40 8C47 16 51 24 53 32H27C29 24 33 16 40 8Z" fill="#FF5A36" stroke="#141829" stroke-width="3.5"/>
+      <circle cx="40" cy="44" r="8" fill="#2EC4B6" stroke="#141829" stroke-width="3.5"/>
+      <path d="M22 52L12 66H22V52Z" fill="#FFB703" stroke="#141829" stroke-width="3.5"/>
+      <path d="M58 52L68 66H58V52Z" fill="#FFB703" stroke="#141829" stroke-width="3.5"/>
+      <path d="M33 62L40 76L47 62H33Z" fill="#FF5A36"/>
     </svg>
   </div>
 
@@ -213,9 +420,9 @@
             <span id="syncDot" class="w-2.5 h-2.5 rounded-full bg-[#2ec4b6] animate-pulse"></span>
             <span id="syncText">雲端即時同步中 / <span class="font-en">LIVE SYNC</span></span>
           </div>
-          <!-- 低調館員管理員入口按鈕 -->
-          <button onclick="openAdminModal()" id="adminTopBtn" class="px-2.5 py-1 rounded-full bg-[#141829]/10 hover:bg-[#141829] hover:text-[#faf3e0] border border-[#141829]/40 text-[11px] font-bold transition-colors cursor-pointer" title="館員管理模式">
-            <span id="adminTopLabel">館員管理 / <span class="font-en">ADMIN</span></span>
+          <!-- 低調管理員入口按鈕 -->
+          <button onclick="openAdminModal()" id="adminTopBtn" class="px-2.5 py-1 rounded-full bg-[#141829]/10 hover:bg-[#141829] hover:text-[#faf3e0] border border-[#141829]/40 text-[11px] font-bold transition-colors cursor-pointer" title="管理員入口">
+            <span id="adminTopLabel">管理員入口 / <span class="font-en">ADMIN</span></span>
           </button>
         </div>
       </div>
@@ -230,7 +437,7 @@
         </div>
 
         <h1 class="text-2xl sm:text-4xl md:text-[42px] font-black tracking-tight text-[#141829] leading-snug">
-          嘉智校園開放日 圖書館歡迎你！
+          校園開放日 歡迎你來到嘉智圖書館！
           <span class="block font-en text-sm sm:text-lg md:text-xl font-bold text-[#ff5a36] mt-1">
             KA CHI SCHOOL OPEN DAY: WELCOME TO THE LIBRARY!
           </span>
@@ -242,10 +449,10 @@
             <svg class="w-6 h-6 shrink-0 mt-0.5 sm:mt-0" viewBox="0 0 24 24" fill="none"><path d="M12 2V6M12 18V22M4.93 4.93L7.76 7.76M16.24 16.24L19.07 19.07M2 12H6M18 12H22" stroke="#141829" stroke-width="2.5" stroke-linecap="round"/><circle cx="12" cy="12" r="4" fill="#FF5A36" stroke="#141829" stroke-width="2.5"/></svg>
             <div>
               <div class="text-xs sm:text-base font-black text-[#141829]">
-                本日主題：太空情報站（圖書館 × 公民與社會發展 × 國民及公民教育）
+                本館主題：太空情報站（圖書館 × 公民與社會發展 × 國民及公民教育）
               </div>
               <div class="font-en text-[11px] sm:text-xs font-bold text-[#141829]/85 mt-0.5 leading-snug">
-                TODAY'S THEME: SPACE INTELLIGENCE STATION (Library × Citizenship and Social Development × National and Civic Education)
+                LIBRARY THEME: SPACE INTELLIGENCE STATION (Library × Citizenship and Social Development × National and Civic Education)
               </div>
             </div>
           </div>
@@ -339,7 +546,7 @@
       <div class="font-en">KA CHI SCHOOL OPEN DAY · SPACE INTELLIGENCE STATION</div>
       <div>
         <button onclick="openAdminModal()" class="underline hover:text-[#ffb703] cursor-pointer">
-          <span id="adminFooterLabel">切換館員管理模式 / Toggle Admin Mode</span>
+          <span id="adminFooterLabel">切換管理員入口模式 / Toggle Admin Mode</span>
         </button>
       </div>
     </footer>
@@ -457,7 +664,7 @@
           </div>
         </div>
 
-        <!-- 右側/下方：情報員資料與快捷留言 (無任務認證印章欄位) -->
+        <!-- 右側/下方：情報員資料與快捷留言 -->
         <div class="lg:col-span-5 flex flex-col justify-between gap-3.5">
           <div class="space-y-3.5">
             <!-- 1. 情報員身分代號 -->
@@ -548,10 +755,32 @@
   </div>
 
   <!-- ==================== 電視牆無人操作自動輪播聚光燈 ==================== -->
-  <div id="slideshowOverlay" onclick="stopSlideshow()" class="fixed inset-0 z-50 hidden bg-[#0b1026]/95 backdrop-blur-md flex flex-col items-center justify-center p-4 sm:p-8 cursor-pointer">
-    <div class="w-full max-w-4xl flex flex-wrap items-center justify-between gap-2 text-[#faf3e0] mb-4">
+  <div id="slideshowOverlay" onclick="stopSlideshow()" class="fixed inset-0 z-50 hidden slideshow-stage backdrop-blur-[3px] flex flex-col items-center justify-center p-4 sm:p-8 cursor-pointer overflow-hidden">
+    <!-- 輪播專屬動態太空背景層：高速星塵、星雲、流星雨、雷達星環、前進網格與巡航火箭 -->
+    <div class="space-nebula opacity-90"></div>
+    <div class="warp-stars-fast"></div>
+    <div class="shooting-star"></div>
+    <div class="shooting-star delay-2"></div>
+    <div class="shooting-star" style="top: 68%; animation-delay: 2.1s; animation-duration: 7.2s;"></div>
+    <div class="radar-ring-outer"></div>
+    <div class="radar-ring-inner"></div>
+    <div class="retro-grid opacity-95"></div>
+
+    <!-- 輪播專屬巡航太空火箭 -->
+    <div class="absolute top-0 left-0 w-14 h-14 md:w-20 md:h-20 pointer-events-none rocket-cruise z-0 select-none" style="animation-duration: 15s;">
+      <svg viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M40 8C54 24 58 44 58 62H22C22 44 26 24 40 8Z" fill="#FAF3E0" stroke="#141829" stroke-width="4"/>
+        <path d="M40 8C47 16 51 24 53 32H27C29 24 33 16 40 8Z" fill="#FF5A36" stroke="#141829" stroke-width="3.5"/>
+        <circle cx="40" cy="44" r="8" fill="#2EC4B6" stroke="#141829" stroke-width="3.5"/>
+        <path d="M22 52L12 66H22V52Z" fill="#FFB703" stroke="#141829" stroke-width="3.5"/>
+        <path d="M58 52L68 66H58V52Z" fill="#FFB703" stroke="#141829" stroke-width="3.5"/>
+        <path d="M33 62L40 76L47 62H33Z" fill="#FF5A36"/>
+      </svg>
+    </div>
+
+    <div class="relative z-10 w-full max-w-4xl flex flex-wrap items-center justify-between gap-2 text-[#faf3e0] mb-4">
       <div class="flex items-center gap-2">
-        <span class="px-3 py-1 rounded-full bg-[#ff5a36] text-white font-black text-xs sm:text-sm border-2 border-[#faf3e0]">
+        <span class="px-3 py-1 rounded-full bg-[#ff5a36] text-white font-black text-xs sm:text-sm border-2 border-[#faf3e0] shadow-[3px_3px_0px_#141829]">
           嘉智太空情報站 · 電視牆輪播 / <span class="font-en">TV SPOTLIGHT</span>
         </span>
       </div>
@@ -560,18 +789,18 @@
       </button>
     </div>
 
-    <div id="slideshowCardContainer" class="w-full max-w-3xl">
+    <div id="slideshowCardContainer" class="relative z-10 w-full max-w-3xl">
       <!-- 輪播卡片內容由 JS 填入 -->
     </div>
   </div>
 
-  <!-- ==================== 館員管理員密碼與確認 Modal (取代 alert/confirm/prompt) ==================== -->
+  <!-- ==================== 管理員入口密碼與確認 Modal ==================== -->
   <div id="adminAuthModal" class="fixed inset-0 z-50 hidden bg-[#0b1026]/85 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="retro-box rounded-3xl p-6 max-w-sm w-full">
-      <h3 class="text-xl font-black text-[#141829] mb-1">館員管理員驗證</h3>
-      <div class="font-en text-xs font-bold text-[#ff5a36] mb-3">LIBRARIAN ADMIN VERIFICATION</div>
+      <h3 class="text-xl font-black text-[#141829] mb-1">管理員入口驗證</h3>
+      <div class="font-en text-xs font-bold text-[#ff5a36] mb-3">ADMIN PORTAL VERIFICATION</div>
       <p class="text-xs font-bold text-[#141829]/80 mb-3">
-        請輸入館員密碼（預設 <span class="font-en font-black">8888</span>）以開啟刪除照片權限：
+        請輸入管理員密碼（預設 <span class="font-en font-black">8888</span>）以開啟刪除照片權限：
       </p>
       <input id="adminPassInput" type="password" inputmode="numeric" maxlength="10" placeholder="請輸入密碼 / Passcode" class="w-full px-3.5 py-2.5 rounded-xl border-2 border-[#141829] bg-white font-en font-bold text-base mb-2 focus:outline-none focus:ring-2 focus:ring-[#ff5a36]" onkeydown="if(event.key==='Enter') verifyAdminPasscode()" />
       <p id="adminPassError" class="hidden text-xs font-black text-[#ff5a36] mb-3">密碼錯誤，請重新輸入！ / Incorrect Passcode!</p>
@@ -594,7 +823,7 @@
     </div>
   </div>
 
-  <!-- ==================== 系統提示訊息條 (取代 alert) ==================== -->
+  <!-- ==================== 系統提示訊息條 ==================== -->
   <div id="toastBanner" class="fixed top-4 left-1/2 -translate-x-1/2 z-[60] hidden px-5 py-2.5 rounded-2xl bg-[#141829] text-[#ffb703] border-2 border-[#ffb703] shadow-[4px_4px_0px_#ff5a36] text-xs sm:text-sm font-black text-center">
   </div>
 
@@ -611,7 +840,7 @@
     let isCloudConnected = false;
     let isAdminMode = false;
 
-    // 專屬手繪復古太空向量徽章字典 (替代 Emoji)
+    // 專屬手繪復古太空向量徽章字典
     const ROLE_BADGES_SVG = {
       'badge-junior': `<svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" fill="#FFB703" stroke="#FAF3E0" stroke-width="2"/><circle cx="9" cy="12" r="2.5" fill="#141829"/><circle cx="15" cy="12" r="2.5" fill="#141829"/><line x1="11.5" y1="12" x2="12.5" y2="12" stroke="#141829" stroke-width="2"/></svg>`,
       'badge-parent': `<svg class="w-4 h-4 inline-block" viewBox="0 0 24 24" fill="none"><rect x="8" y="8" width="8" height="8" rx="2" fill="#2EC4B6" stroke="#FAF3E0" stroke-width="2"/><line x1="3" y1="12" x2="8" y2="12" stroke="#FFB703" stroke-width="2.5"/><line x1="16" y1="12" x2="21" y2="12" stroke="#FFB703" stroke-width="2.5"/></svg>`,
@@ -764,13 +993,13 @@
       }
     }
 
-    // ==================== 館員管理員模式 (自訂 Modal 密碼驗證與刪照) ====================
+    // ==================== 管理員入口模式 ====================
     function openAdminModal() {
       if (isAdminMode) {
         isAdminMode = false;
         updateAdminUI();
         renderWall();
-        showToast('已退出館員管理模式 / Admin Mode Exited');
+        showToast('已退出管理員入口模式 / Admin Mode Exited');
         return;
       }
       document.getElementById('adminPassInput').value = '';
@@ -790,7 +1019,7 @@
         closeAdminModal();
         updateAdminUI();
         renderWall();
-        showToast('已開啟館員管理模式！卡片右上角可點擊刪除 / Admin Mode Enabled');
+        showToast('已開啟管理員入口模式！卡片右上角可點擊刪除 / Admin Mode Enabled');
       } else {
         document.getElementById('adminPassError').classList.remove('hidden');
       }
@@ -807,13 +1036,13 @@
         topBtn.classList.add('bg-[#ff5a36]', 'text-white');
         topLabel.innerHTML = '退出管理模式 / <span class="font-en">EXIT ADMIN</span>';
         clearAllBtn.classList.remove('hidden');
-        footerLabel.textContent = '退出館員管理模式 / Exit Admin Mode';
+        footerLabel.textContent = '退出管理員入口模式 / Exit Admin Mode';
       } else {
         topBtn.classList.add('bg-[#141829]/10');
         topBtn.classList.remove('bg-[#ff5a36]', 'text-white');
-        topLabel.innerHTML = '館員管理 / <span class="font-en">ADMIN</span>';
+        topLabel.innerHTML = '管理員入口 / <span class="font-en">ADMIN</span>';
         clearAllBtn.classList.add('hidden');
-        footerLabel.textContent = '切換館員管理模式 / Toggle Admin Mode';
+        footerLabel.textContent = '切換管理員入口模式 / Toggle Admin Mode';
       }
     }
 
@@ -1281,7 +1510,7 @@
       const badgeSvg = ROLE_BADGES_SVG[post.badgeKey] || ROLE_BADGES_SVG['badge-junior'];
       const container = document.getElementById('slideshowCardContainer');
       container.innerHTML = `
-        <div class="${post.frame || 'frame-cream'} border-4 border-[#141829] shadow-[10px_10px_0px_#ffb703] rounded-3xl p-5 sm:p-8 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+        <div class="${post.frame || 'frame-cream'} slideshow-card-anim border-4 border-[#141829] shadow-[10px_10px_0px_#ffb703] rounded-3xl p-5 sm:p-8 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
           <div class="md:col-span-7 relative rounded-2xl overflow-hidden border-4 border-[#141829] aspect-[4/3]">
             <img src="${post.image}" class="w-full h-full object-cover" />
           </div>
