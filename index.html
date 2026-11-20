@@ -778,18 +778,18 @@
       </svg>
     </div>
 
-    <div class="relative z-10 w-full max-w-4xl flex flex-wrap items-center justify-between gap-2 text-[#faf3e0] mb-4">
+    <div class="relative z-10 w-full max-w-7xl flex flex-wrap items-center justify-between gap-3 text-[#faf3e0] mb-4">
       <div class="flex items-center gap-2">
-        <span class="px-3 py-1 rounded-full bg-[#ff5a36] text-white font-black text-xs sm:text-sm border-2 border-[#faf3e0] shadow-[3px_3px_0px_#141829]">
+        <span class="px-4 py-1.5 rounded-full bg-[#ff5a36] text-white font-black text-sm sm:text-base border-2 border-[#faf3e0] shadow-[3px_3px_0px_#141829]">
           嘉智太空情報站 · 電視牆輪播 / <span class="font-en">TV SPOTLIGHT</span>
         </span>
       </div>
-      <button onclick="stopSlideshow()" class="retro-btn px-4 py-1.5 rounded-xl bg-[#ffb703] text-[#141829] font-black text-xs sm:text-sm cursor-pointer">
+      <button onclick="stopSlideshow()" class="retro-btn px-5 py-2 rounded-xl bg-[#ffb703] text-[#141829] font-black text-sm sm:text-base cursor-pointer">
         點擊返回情報牆 / <span class="font-en">BACK TO WALL</span>
       </button>
     </div>
 
-    <div id="slideshowCardContainer" class="relative z-10 w-full max-w-3xl">
+    <div id="slideshowCardContainer" class="relative z-10 w-full max-w-7xl">
       <!-- 輪播卡片內容由 JS 填入 -->
     </div>
   </div>
@@ -1510,22 +1510,22 @@
       const badgeSvg = ROLE_BADGES_SVG[post.badgeKey] || ROLE_BADGES_SVG['badge-junior'];
       const container = document.getElementById('slideshowCardContainer');
       container.innerHTML = `
-        <div class="${post.frame || 'frame-cream'} slideshow-card-anim border-4 border-[#141829] shadow-[10px_10px_0px_#ffb703] rounded-3xl p-5 sm:p-8 grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-          <div class="md:col-span-7 relative rounded-2xl overflow-hidden border-4 border-[#141829] aspect-[4/3]">
+        <div class="${post.frame || 'frame-cream'} slideshow-card-anim border-[5px] border-[#141829] shadow-[14px_14px_0px_#ffb703] rounded-3xl p-4 sm:p-7 md:p-8 grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center">
+          <div class="md:col-span-8 relative rounded-2xl overflow-hidden border-4 border-[#141829] aspect-[4/3] max-h-[68vh] w-full shadow-[6px_6px_0px_#141829]">
             <img src="${post.image}" class="w-full h-full object-cover" />
           </div>
-          <div class="md:col-span-5 flex flex-col justify-between space-y-4">
+          <div class="md:col-span-4 flex flex-col justify-between space-y-5">
             <div>
-              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#141829] text-[#ffb703] text-xs sm:text-sm font-black mb-3">
+              <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#141829] text-[#ffb703] text-xs sm:text-sm md:text-base font-black mb-3">
                 ${badgeSvg}
                 <span>${escapeHtml(post.role)} / <span class="font-en">${escapeHtml(post.roleEn || '')}</span></span>
               </span>
-              <h3 class="text-2xl sm:text-3xl font-black text-[#141829] mb-3">${escapeHtml(post.name)}</h3>
-              <p class="text-lg sm:text-xl font-bold text-[#141829]/90 leading-relaxed">「${escapeHtml(post.message)}」</p>
+              <h3 class="text-2xl sm:text-3xl md:text-4xl font-black text-[#141829] mb-3 leading-tight">${escapeHtml(post.name)}</h3>
+              <p class="text-lg sm:text-xl md:text-2xl font-bold text-[#141829]/90 leading-relaxed">「${escapeHtml(post.message)}」</p>
             </div>
-            <div class="pt-4 border-t-2 border-dashed border-[#141829]/30 flex items-center justify-between text-xs sm:text-sm font-black">
+            <div class="pt-4 border-t-2 border-dashed border-[#141829]/30 flex items-center justify-between text-xs sm:text-sm md:text-base font-black">
               <span>嘉智圖書館 · 太空情報站</span>
-              <span class="font-en">Salute ${post.likes || 0}</span>
+              <span class="font-en text-sm sm:text-lg">Salute ${post.likes || 0}</span>
             </div>
           </div>
         </div>
